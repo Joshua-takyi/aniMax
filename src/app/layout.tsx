@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
-import Nav from "@/components/nav";
 import localFont from "next/font/local"; // Correct import
 
 const campton = localFont({
@@ -32,7 +31,6 @@ export default function RootLayout({
 					enableSystem
 					disableTransitionOnChange
 				>
-					<Nav />
 					{children}
 				</ThemeProvider>
 			</body>
