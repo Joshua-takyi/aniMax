@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import localFont from "next/font/local"; // Correct import
+import QueryProvider from "@/providers/provider";
+import RenderMounted from "@/components/renderMounted";
 
 const campton = localFont({
 	src: "../fonts/CamptonBook.otf",
@@ -21,18 +23,17 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en">
-			<body
-				className={`${campton.className}  antialiased`}
-				suppressHydrationWarning
-			>
-				<ThemeProvider
-					attribute="class"
-					defaultTheme="system"
-					enableSystem
-					disableTransitionOnChange
-				>
-					{children}
-				</ThemeProvider>
+			<body className={`${campton.className}  antialiased`}>
+				<RenderMounted>
+					<ThemeProvider
+						attribute="class"
+						defaultTheme="system"
+						enableSystem
+						disableTransitionOnChange
+					>
+						<QueryProvider>{children}</QueryProvider>
+					</ThemeProvider>
+				</RenderMounted>
 			</body>
 		</html>
 	);

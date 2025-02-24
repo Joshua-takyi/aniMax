@@ -1,27 +1,38 @@
 "use client";
-import useSearch from "@/strore/store";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Search } from "lucide-react";
+import { useRouter } from "next/navigation";
+import useSearch from "@/store/store";
 
 export default function SearchComponent() {
-	const search = useSearch((state) => state.search);
+	const router = useRouter();
+	const search = useSearch((state: { search: string }) => state.search);
+
+	const handleSubmit = () => {
+		router.push(`/search?q=${encodeURIComponent(search)}`);
+		if (search) {
+			useSearch.setState({ search: "" });
+		}
+	};
 
 	return (
-		<div className="relative max-w-md w-full">
+		<div className=" max-w-md w-full flex items-center ">
 			<Input
 				type="text"
 				value={search}
-				className="p-4 rounded-md border "
+				className={`py-6 px-3 rounded-l-full outline-none transition-all duration-300 ease-in-out`}
 				onChange={(e) => useSearch.setState({ search: e.target.value })}
 				placeholder="Search anime..."
+				onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
 			/>
 			<Button
-				size="icon"
-				className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 cursor-pointer"
-				variant="ghost"
+				size="lg"
+				role="submit"
+				onClick={handleSubmit}
+				className="cursor-pointer rounded-r-full py-6 transition-all duration-300 ease-in-out hover:bg-primary/90"
 			>
-				<Search className="h-4 w-4 " />
+				<Search />
 			</Button>
 		</div>
 	);

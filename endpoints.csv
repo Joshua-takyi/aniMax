@@ -7,19 +7,19 @@ Anime Get Anime Episodes GET /anime/{id}/episodes Fetches episodes list with pag
 Anime Get Anime Episode by ID GET /anime/{id}/episodes/{episode} Fetches a specific episode.
 Anime Get Anime News GET /anime/{id}/news Retrieves news related to the anime.
 Anime Get Anime Forum GET /anime/{id}/forum Fetches forum topics.
-Anime Get Anime Videos GET /anime/{id}/videos Retrieves video content (trailers, episodes).
+Anime Get Anime Videos GET /anime/{id}/videos Retrieves video content (trailers,episodes).
 Anime Get Anime Videos Episodes GET /anime/{id}/videos/episodes Fetches video episodes.
 Anime Get Anime Pictures GET /anime/{id}/pictures Retrieves images related to the anime.
-Anime Get Anime Statistics GET /anime/{id}/statistics Fetches statistics (watching, completed, scores).
+Anime Get Anime Statistics GET /anime/{id}/statistics Fetches statistics (watching,completed,scores).
 Anime Get Anime More Info GET /anime/{id}/moreinfo Retrieves additional metadata.
 Anime Get Anime Recommendations GET /anime/{id}/recommendations Fetches recommendations related to the anime.
 Anime Get Anime User Updates GET /anime/{id}/user_updates Fetches user activity (watching status).
-Anime Get Anime Reviews GET /anime/{id}/reviews Retrieves reviews with filtering options (spoilers, preliminary).
+Anime Get Anime Reviews GET /anime/{id}/reviews Retrieves reviews with filtering options (spoilers,preliminary).
 Anime Get Anime Relations GET /anime/{id}/relations Fetches related anime.
 Anime Get Anime Themes GET /anime/{id}/themes Fetches theme songs.
 Anime Get Anime External Links GET /anime/{id}/external Fetches external links.
 Anime Get Anime Streaming Links GET /anime/{id}/streaming Fetches streaming platforms.
-Anime Anime Search GET /anime Searches anime using filters (type, status, score, genres, etc.).
+Anime Anime Search GET /anime Searches anime using filters (type,status,score,genres,etc.).
 Characters Get Character Full Details GET /characters/{id} Fetches full character details by ID.
 Characters Get Character Basic Details GET /characters/{id} Fetches basic character details by ID.
 Characters Get Character Anime Roles GET /characters/{id}/anime Fetches anime roles associated with the character.
@@ -30,9 +30,9 @@ Clubs Get Club Details GET /clubs/{id} Fetches club information by ID.
 Clubs Get Club Members GET /clubs/{id}/members Fetches members of the club with pagination.
 Clubs Get Club Staff GET /clubs/{id}/staff Fetches moderators/admins of the club.
 Clubs Get Club Relations GET /clubs/{id}/relations Fetches related anime/manga associated with the club.
-Clubs Club Search GET /clubs Searches clubs using filters (type, category, name).
-Genres Get Anime Genres GET /genres/anime Fetches anime genres with optional filter (genres, themes, etc.).
-Genres Get Manga Genres GET /genres/manga Fetches manga genres with optional filter (genres, themes, etc.).
+Clubs Club Search GET /clubs Searches clubs using filters (type,category,name).
+Genres Get Anime Genres GET /genres/anime Fetches anime genres with optional filter (genres,themes,etc.).
+Genres Get Manga Genres GET /genres/manga Fetches manga genres with optional filter (genres,themes,etc.).
 Magazines Get Magazines GET /magazines Retrieves serialized manga magazines with pagination and filtering.
 Manga Get Manga by ID (Full) GET /manga/{id} Fetches full manga details by ID.
 Manga Get Manga by ID (Basic) GET /manga/{id} Fetches basic manga details by ID.
@@ -40,14 +40,14 @@ Manga Get Manga Characters GET /manga/{id}/characters Retrieves characters assoc
 Manga Get Manga News GET /manga/{id}/news Fetches news related to the manga.
 Manga Get Manga Topics GET /manga/{id}/topics Fetches forum topics related to the manga.
 Manga Get Manga Pictures GET /manga/{id}/pictures Retrieves images related to the manga.
-Manga Get Manga Statistics GET /manga/{id}/statistics Fetches statistics (reading, completed, scores).
+Manga Get Manga Statistics GET /manga/{id}/statistics Fetches statistics (reading,completed,scores).
 Manga Get Manga More Info GET /manga/{id}/moreinfo Retrieves additional metadata about the manga.
 Manga Get Manga Recommendations GET /manga/{id}/recommendations Fetches recommendations related to the manga.
 Manga Get Manga User Updates GET /manga/{id}/user_updates Fetches user activity (reading status).
-Manga Get Manga Reviews GET /manga/{id}/reviews Retrieves reviews with filtering options (spoilers, preliminary).
+Manga Get Manga Reviews GET /manga/{id}/reviews Retrieves reviews with filtering options (spoilers,preliminary).
 Manga Get Manga Relations GET /manga/{id}/relations Fetches related manga.
 Manga Get Manga External Links GET /manga/{id}/external Fetches external links related to the manga.
-Manga Manga Search GET /manga Searches manga using filters (type, status, score, genres, etc.).
+Manga Manga Search GET /manga Searches manga using filters (type,status,score,genres,etc.).
 People Get Person Full Details GET /people/{id} Fetches full person details by ID.
 People Get Person Basic Details GET /people/{id} Fetches basic person details by ID.
 People Get Person Anime Roles GET /people/{id}/anime Retrieves anime roles associated with the person.
@@ -68,8 +68,8 @@ Recommendations Get Recent Anime Recommendations GET /recommendations/anime Fetc
 Recommendations Get Recent Manga Recommendations GET /recommendations/manga Fetches recent manga recommendations.
 Reviews Get Recent Anime Reviews GET /reviews/anime Fetches recent anime reviews (filter by spoilers/preliminary).
 Reviews Get Recent Manga Reviews GET /reviews/manga Fetches recent manga reviews (filter by spoilers/preliminary).
-Schedules Get Schedule GET /schedules Fetches anime airing schedule (filter by day, kids, sfw).
-Top Get Top Anime GET /top/anime Fetches top anime (filter by type, rating, etc.).
+Schedules Get Schedule GET /schedules Fetches anime airing schedule (filter by day,kids,sfw).
+Top Get Top Anime GET /top/anime Fetches top anime (filter by type,rating,etc.).
 Top Get Top Manga GET /top/manga Fetches top manga (filter by type).
 Top Get Top People GET /top/people Fetches top contributors.
 Top Get Top Characters GET /top/characters Fetches most popular characters.

@@ -1,5 +1,6 @@
 import Nav from "@/components/nav";
 import React from "react";
+import HeroSection from "./hero";
 
 export default function HomeLayout({
 	children,
@@ -7,6 +8,7 @@ export default function HomeLayout({
 	return (
 		<div>
 			<Nav />
+			<HeroSection />
 			{children}
 		</div>
 	);
