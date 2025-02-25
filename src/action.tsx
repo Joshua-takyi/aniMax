@@ -15,29 +15,61 @@ export interface MovieProps {
 }
 
 // Function to fetch movies with pagination support
+export interface MovieProps {
+	mal_id: number;
+	title: string;
+	rating: string;
+	status: string;
+	genres?: { mal_id: number; name: string }[];
+	images: {
+		webp: {
+			large_image_url: string;
+		};
+	};
+	// ... other properties as needed
+}
+
+export interface GetMoviesParams {
+	page: number;
+	type: string;
+	genre?: string;
+	rating?: string;
+	status?: string;
+}
+
 export async function GetMovies({
 	genre,
 	rating,
 	status,
 	page,
 	type,
-}: {
-	page: number;
-	type: string;
-	genre?: string;
-	rating?: string;
-	status?: string;
-}): Promise<{ success: boolean; data: MovieProps[] }> {
+}: GetMoviesParams): Promise<{ success: boolean; data: MovieProps[] }> {
 	try {
+		// Map the rating values to match Jikan API's rating parameter
+		const ratingMapping: { [key: string]: string } = {
+			g: "g",
+			pg: "pg",
+			r17: "r17",
+			r: "r",
+			rx: "rx",
+		};
+
+		// Map the status values to match Jikan API's status parameter
+		const statusMapping: { [key: string]: string } = {
+			airing: "airing",
+			finished: "complete",
+			upcoming: "upcoming",
+		};
+
 		const res = await axios.get(`${API_URL}/anime`, {
 			params: {
-				type: type,
+				type,
 				page,
-				genre: genre,
-				min_score: rating,
-				status: status,
-				limit: 18,
+				limit: 20,
 				order_by: "popularity",
+				rating: rating ? ratingMapping[rating.toLowerCase()] : undefined,
+				status: status ? statusMapping[status.toLowerCase()] : undefined,
+				genres: genre || undefined,
 			},
 			headers: {
 				"Content-Type": "application/json",

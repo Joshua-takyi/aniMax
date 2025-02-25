@@ -2,13 +2,19 @@
 
 import { GetAnimeById } from "@/action";
 import Loader from "@/app/loading";
+import GenreBtns from "@/components/genre-components";
 // import VideoSection from "@/components/videoSection";
 import { useQuery } from "@tanstack/react-query";
+import Image from "next/image";
 import { useParams } from "next/navigation";
 
 interface AnimeData {
 	trailer: {
 		youtube_id: string;
+	};
+	genres: {
+		mal_id: number;
+		name: string;
 	};
 	// Add other anime data properties as needed
 }
@@ -51,29 +57,36 @@ export default function ProfilePage() {
 	}
 
 	return (
-		<main className="container mx-auto px-4 py-8">
-			<div className="w-full videoContainer">
-				{data.trailer && data.trailer.youtube_id ? (
+		<main className=" py-8">
+			<div className="w-full relative  md:pb-[56.25%]">
+				{data?.trailer.youtube_id ? (
 					<iframe
 						width="960"
 						allowFullScreen
 						height="500"
-						src={`https://www.youtube.com/embed/${data.trailer.youtube_id}?enablejsapi=1&wmode=opaque&autoplay=1`}
+						src={`https://www.youtube.com/embed/${data.trailer.youtube_id}?enablejsapi=1&wmode=opaque&autoplay=1&rel=0`}
 						title="YouTube video player"
-						frameBorder="0"
 						allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-						// referrerpolicy="strict-origin-when-cross-origin"
-						// allowfullscreen
+						className="w-[100%] h-full absolute insert-0"
 					></iframe>
 				) : (
 					<div className="flex justify-center items-center min-h-[315px] bg-gray-100 rounded-lg">
-						<p className="text-gray-500">No video available</p>
+						<div className="flex h-[50dvh] justify-center items-center">
+							<Image
+								src="/assets/images/no-video.png"
+								alt="No Image"
+								width={400}
+								height={400}
+								className="w-full h-full object-contain  "
+							/>
+						</div>
 					</div>
 				)}
 			</div>
-			{data.trailer && data.trailer.youtube_id && (
-				<p className="text-4xl text-red-500">{data.trailer.youtube_id}</p>
-			)}
+			<section>
+				{/* genre section */}
+				{data?.genres && <GenreBtns data={data.genres} />}
+			</section>
 		</main>
 	);
 }

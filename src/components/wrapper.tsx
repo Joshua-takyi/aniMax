@@ -8,7 +8,7 @@ export default function Wrapper({
 	className?: string;
 }>) {
 	return (
-		<section className={`container mx-auto px-4 md:px-8 lg:px-40 ${className}`}>
+		<section className={`container mx-auto px-4 md:px-8 lg:px-12 ${className}`}>
 			{children}
 		</section>
 	);

@@ -1,29 +1,26 @@
 "use client";
-
 import { useState } from "react";
 import { ChevronDown, Filter, X } from "lucide-react";
 import { Button } from "./ui/button";
 
+// --- Genre Filter ---
 interface SelectProps {
 	id: number;
 	name: string;
 	isMulti?: boolean;
 }
 
-interface SidebarProps {
+interface GenreFilterProps {
 	data: SelectProps[];
+	selectedGenres: string[];
+	onGenreChange: (genres: string[]) => void;
 }
 
-// Genre filter component
 function GenreFilter({
 	data,
 	selectedGenres,
 	onGenreChange,
-}: {
-	data: SelectProps[];
-	selectedGenres: string[];
-	onGenreChange: (genres: string[]) => void;
-}) {
+}: GenreFilterProps) {
 	const [isOpen, setIsOpen] = useState(true);
 
 	const handleGenreChange = (genreName: string) => {
@@ -37,6 +34,7 @@ function GenreFilter({
 	return (
 		<div className="border-b border-gray-200 pb-4">
 			<button
+				aria-expanded={isOpen}
 				className="flex w-full items-center justify-between py-2 text-sm font-medium"
 				onClick={() => setIsOpen(!isOpen)}
 			>
@@ -61,7 +59,7 @@ function GenreFilter({
 								onChange={() => handleGenreChange(genre.name)}
 								className="rounded border-gray-300"
 							/>
-							<span className="text-sm ">{genre.name}</span>
+							<span className="text-sm">{genre.name}</span>
 						</label>
 					))}
 				</div>
@@ -70,20 +68,20 @@ function GenreFilter({
 	);
 }
 
-// Rating filter component
-function RatingFilter({
-	selectedRating,
-	onRatingChange,
-}: {
+// --- Rating Filter ---
+interface RatingFilterProps {
 	selectedRating: string;
 	onRatingChange: (rating: string) => void;
-}) {
+}
+
+function RatingFilter({ selectedRating, onRatingChange }: RatingFilterProps) {
 	const [isOpen, setIsOpen] = useState(true);
 	const ratings = ["g", "pg", "pg13", "r17", "r", "rx"];
 
 	return (
 		<div className="border-b border-gray-200 pb-4">
 			<button
+				aria-expanded={isOpen}
 				className="flex w-full items-center justify-between py-2 text-sm font-medium"
 				onClick={() => setIsOpen(!isOpen)}
 			>
@@ -118,28 +116,33 @@ function RatingFilter({
 	);
 }
 
-// Status filter component
-function StatusFilter({
-	selectedStatuses,
-	onStatusChange,
-}: {
+// --- Status Filter ---
+interface StatusFilterProps {
 	selectedStatuses: string[];
 	onStatusChange: (statuses: string[]) => void;
-}) {
-	const [isOpen, setIsOpen] = useState(true);
-	const statuses = ["Airing", "Finished", "Upcoming"];
+}
 
-	const handleStatusChange = (status: string) => {
+const statusOptions = [
+	{ value: "airing", label: "Airing" },
+	{ value: "finished", label: "Finished" },
+	{ value: "upcoming", label: "Upcoming" },
+];
+
+function StatusFilter({ selectedStatuses, onStatusChange }: StatusFilterProps) {
+	const [isOpen, setIsOpen] = useState(true);
+
+	const handleStatusChange = (statusValue: string) => {
 		onStatusChange(
-			selectedStatuses.includes(status)
-				? selectedStatuses.filter((s) => s !== status)
-				: [...selectedStatuses, status]
+			selectedStatuses.includes(statusValue)
+				? selectedStatuses.filter((s) => s !== statusValue)
+				: [...selectedStatuses, statusValue]
 		);
 	};
 
 	return (
 		<div className="border-b border-gray-200 pb-4">
 			<button
+				aria-expanded={isOpen}
 				className="flex w-full items-center justify-between py-2 text-sm font-medium"
 				onClick={() => setIsOpen(!isOpen)}
 			>
@@ -153,18 +156,18 @@ function StatusFilter({
 
 			{isOpen && (
 				<div className="mt-2 space-y-1">
-					{statuses.map((status) => (
+					{statusOptions.map((option) => (
 						<label
-							key={status}
+							key={option.value}
 							className="flex items-center space-x-2 cursor-pointer hover:bg-primary/90 p-1 rounded"
 						>
 							<input
 								type="checkbox"
-								checked={selectedStatuses.includes(status)}
-								onChange={() => handleStatusChange(status)}
+								checked={selectedStatuses.includes(option.value)}
+								onChange={() => handleStatusChange(option.value)}
 								className="rounded border-gray-300"
 							/>
-							<span className="text-sm ">{status}</span>
+							<span className="text-sm">{option.label}</span>
 						</label>
 					))}
 				</div>
@@ -173,7 +176,11 @@ function StatusFilter({
 	);
 }
 
-// Main Sidebar component
+// --- Main Sidebar Component ---
+interface SidebarProps {
+	data: SelectProps[];
+}
+
 export function SideBar({ data }: SidebarProps) {
 	const [isVisible, setIsVisible] = useState(true);
 	const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
@@ -184,7 +191,7 @@ export function SideBar({ data }: SidebarProps) {
 		const url = new URL(window.location.href);
 		const params = new URLSearchParams(url.search);
 
-		// Update genres
+		// Update genres (as comma-separated list)
 		if (selectedGenres.length > 0) {
 			params.set("genre", selectedGenres.join(","));
 		} else {
@@ -228,12 +235,10 @@ export function SideBar({ data }: SidebarProps) {
 
 			<aside
 				className={`
-				sticky top-0 h-fit max-h-screen  w-64 md:w-72
-				transform transition-transform duration-300 ease-in-out
-				${isVisible ? "translate-x-0" : "translate-x-full md:translate-x-0"}
-				border-l md:border-l-0 md:border-r border-gray-200
-				p-6 overflow-y-auto z-40
-			`}
+          sticky top-0 h-fit max-h-screen w-64 md:w-72 transform transition-transform duration-300 ease-in-out
+          ${isVisible ? "translate-x-0" : "translate-x-full md:translate-x-0"}
+          border-l md:border-l-0 md:border-r border-gray-200 p-6 overflow-y-auto z-40
+        `}
 			>
 				<button
 					className="md:hidden absolute top-4 right-4 text-gray-500"
@@ -245,7 +250,7 @@ export function SideBar({ data }: SidebarProps) {
 				<div className="flex items-center justify-between mb-6">
 					<h2 className="text-lg font-semibold">Filters</h2>
 					<button
-						className="text-sm text-blue-600 hover:text-blue-800"
+						className="text-sm text-blue-600 hover:text-blue-800 cursor-pointer"
 						onClick={handleClearAll}
 					>
 						Clear all
