@@ -9,12 +9,14 @@ import { useSearchParams } from "next/navigation";
 export default function Page() {
 	const searchParams = useSearchParams();
 	const searchData = searchParams.get("q");
+	const types = searchParams.get("tv,movies");
 
 	const { data, isLoading } = useQuery({
 		queryKey: ["search", searchData],
 		queryFn: async () => {
 			const res = await FindBySearch({
 				search: searchData ?? "",
+				type: types ?? "",
 			});
 			return res.data;
 		},

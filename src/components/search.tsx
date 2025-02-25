@@ -10,7 +10,7 @@ export default function SearchComponent() {
 	const search = useSearch((state: { search: string }) => state.search);
 
 	const handleSubmit = () => {
-		router.push(`/search?q=${encodeURIComponent(search)}`);
+		router.push(`/search?q=${encodeURIComponent(search)}&type=tv,movie`);
 		if (search) {
 			useSearch.setState({ search: "" });
 		}

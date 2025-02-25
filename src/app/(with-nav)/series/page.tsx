@@ -3,6 +3,8 @@
 import { GetMovies, MovieProps } from "@/action";
 import Loader from "@/app/loading";
 import { CardComponent } from "@/components/itemsCard";
+import { MotionDiv } from "@/components/motion";
+import { AnimatePresence } from "framer-motion";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
@@ -13,7 +15,8 @@ export default function Series() {
 	const rating = searchParams.get("rating") ?? "";
 	const status = searchParams.get("status") ?? "";
 	const [currentPage, setCurrentPage] = useState(1);
-	const [data, setData] = useState([]);
+	const [data, setData] = useState<MovieProps[]>([]); // Define the type of data
+	const [isLoading, setIsLoading] = useState(true); // Track initial loading state
 	const [isLoadingMore, setIsLoadingMore] = useState(false);
 	const [hasMore, setHasMore] = useState(true);
 	const { ref, inView } = useInView();
@@ -56,16 +59,22 @@ export default function Series() {
 
 	useEffect(() => {
 		(async () => {
+			setIsLoading(true);
 			try {
 				const initialMovies = await fetchMovies(1);
 				setData(initialMovies);
 				setHasMore(initialMovies.length > 0);
 			} catch (error) {
 				console.error("Error fetching initial movies:", error);
+			} finally {
+				setIsLoading(false);
 			}
 		})();
 	}, []);
 
+	if (isLoading) {
+		return <Loader />;
+	}
 	if (!data || data.length === 0) {
 		return <div>no data found</div>;
 	}
@@ -73,20 +82,25 @@ export default function Series() {
 	return (
 		<main>
 			<h1 className="text-4xl font-bold mb-10">Tv Series</h1>
-			<section className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-				{data.map((item: MovieProps) => (
-					<CardComponent
-						key={item.mal_id}
-						title={item.title}
-						rating={item.rating}
-						imageUrl={item.images.webp.large_image_url}
-						id={item.mal_id}
-					/>
-				))}
-				<div ref={ref}>
-					<Loader />
-				</div>
-			</section>
+			<AnimatePresence>
+				<MotionDiv
+					className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					transition={{ duration: 0.5 }}
+				>
+					{data.map((item: MovieProps) => (
+						<CardComponent
+							key={item.mal_id}
+							title={item.title}
+							rating={item.rating}
+							imageUrl={item.images.webp.large_image_url}
+							id={item.mal_id}
+						/>
+					))}
+					<div ref={ref}>{isLoadingMore && <Loader />}</div>
+				</MotionDiv>
+			</AnimatePresence>
 		</main>
 	);
 }

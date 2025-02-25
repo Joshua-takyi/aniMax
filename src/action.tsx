@@ -100,11 +100,18 @@ export async function GetMovies({
 	}
 }
 
-export async function FindBySearch({ search }: { search: string }) {
+export async function FindBySearch({
+	search,
+	type,
+}: {
+	search: string;
+	type: string;
+}) {
 	try {
 		const res = await axios.get(`${API_URL}/anime?`, {
 			params: {
 				q: search,
+				type,
 				limit: 18,
 				order_by: "popularity",
 			},
@@ -147,6 +154,35 @@ export async function GetAnimeById({ id }: { id: string }) {
 				message: "data fetched successfully",
 			};
 		}
+		throw new Error("failed to get data");
+	} catch (error) {
+		if (error instanceof AxiosError) {
+			if (error.response?.status === 429) {
+				throw new Error("rate-limited");
+			}
+			throw new Error(
+				error.response?.data?.message || "Failed to fetch movies"
+			);
+		}
+		throw error;
+	}
+}
+
+export async function GetCharactersByAnimeId({ animeId }: { animeId: string }) {
+	try {
+		const res = await axios.get(`${API_URL}/anime/${animeId}/characters`, {
+			headers: {
+				"Content-Type": "application/json",
+			},
+		});
+		if (res.status === 200) {
+			return {
+				success: true,
+				data: res.data.data,
+				message: "data fetched successfully",
+			};
+		}
+		console.log(res.data);
 		throw new Error("failed to get data");
 	} catch (error) {
 		if (error instanceof AxiosError) {

@@ -4,6 +4,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import localFont from "next/font/local"; // Correct import
 import QueryProvider from "@/providers/provider";
 import RenderMounted from "@/components/renderMounted";
+import MainNav from "./(with-nav)/component/nav";
 
 const campton = localFont({
 	src: "../fonts/CamptonBook.otf",
@@ -31,7 +32,10 @@ export default function RootLayout({
 						enableSystem
 						disableTransitionOnChange
 					>
-						<QueryProvider>{children}</QueryProvider>
+						<QueryProvider>
+							<MainNav />
+							{children}
+						</QueryProvider>
 					</ThemeProvider>
 				</RenderMounted>
 			</body>
