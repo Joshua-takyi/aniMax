@@ -53,11 +53,7 @@ export default function GenreBtns({
               rounded-md px-3 py-2 text-sm border border-primary
               transition-all duration-200 hover:bg-primary hover:text-black
               whitespace-nowrap flex-shrink-0
-              ${
-								currentGenre === genre.mal_id.toString()
-									? "bg-primary text-black"
-									: ""
-							}
+              ${currentGenre === genre.mal_id.toString() ? "bg-primary" : ""}
             `}
 					>
 						{genre.name}

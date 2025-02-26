@@ -84,7 +84,7 @@ export default function Movies() {
 			<h1 className="text-4xl font-bold md:mb-10">Movies</h1>
 			<AnimatePresence>
 				<motion.section
-					className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 md:gap-4 gap-2"
+					className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 md:gap-4 gap-2"
 					initial={{ opacity: 0 }}
 					animate={{ opacity: 1 }}
 					transition={{ duration: 0.5 }}

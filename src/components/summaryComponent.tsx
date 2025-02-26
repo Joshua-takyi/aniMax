@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface SummaryComponentProps {
 	image: string;
@@ -9,11 +9,9 @@ interface SummaryComponentProps {
 	type: string;
 	studios: string[];
 	released: string;
-	englishTitle: string;
-	japaneseTitle: string;
 	synopsis: string;
-	rating: string; // Added rating
-	genres: string[]; // Added genres
+	rating: string;
+	genres: string[];
 }
 
 export default function SummaryComponent({
@@ -23,90 +21,110 @@ export default function SummaryComponent({
 	type,
 	studios,
 	released,
-	englishTitle,
-	japaneseTitle,
 	synopsis,
-	rating, // Added rating
-	genres, // Added genres
+	rating,
+	genres,
 }: Readonly<SummaryComponentProps>) {
 	const [isExpanded, setIsExpanded] = useState(false);
-	const truncatedLength = 200;
+	const [isMobile, setIsMobile] = useState(false);
+	const truncatedLength = isMobile ? 150 : 200;
+
+	useEffect(() => {
+		const checkScreenSize = () => {
+			setIsMobile(window.innerWidth < 891);
+		};
+		// Initial check
+		checkScreenSize();
+		// Add event listener for resize
+		window.addEventListener("resize", checkScreenSize);
+		// Cleanup
+		return () => window.removeEventListener("resize", checkScreenSize);
+	}, []);
 
 	const handleToggleExpand = () => {
 		setIsExpanded(!isExpanded);
 	};
 
 	return (
-		<div className="w-full overflow-hidden">
-			<div className="flex flex-col md:flex-row">
-				{/* Image section - fixed width on desktop, full width on mobile */}
-				<div className="relative w-full md:w-64 h-80 md:h-auto shrink-0 aspect-square">
+		<div className="w-full overflow-hidden bg-white dark:bg-gray-900  ">
+			<div className={`flex ${isMobile ? "flex-col" : "flex-row"} gap-6 `}>
+				{/* Image section */}
+				<div
+					className={`relative w-48 h-64 shrink-0 mx-auto ${
+						isMobile ? "w-full h-72" : ""
+					}`}
+				>
 					<Image
 						src={image}
-						alt={englishTitle}
+						alt={status}
 						fill
-						className="object-cover"
-						sizes="(max-width: 768px) 100vw, 256px"
+						className="object-cover "
+						sizes={isMobile ? "100vw" : "256px"}
 						priority
 					/>
 				</div>
 
 				{/* Content section */}
-				<div className="flex-1 p-4 md:p-6 flex flex-col">
-					{/* Titles */}
-					<div className="mb-4">
-						<h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
-							{englishTitle}
-						</h1>
-						<h2 className="text-sm md:text-base text-gray-600 dark:text-gray-300 mt-1">
-							{japaneseTitle}
-						</h2>
-					</div>
-
-					{/* Metadata - grid for medium screens and up, stacked for small screens */}
-					<div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm mb-4">
+				<div className="flex-1 flex flex-col">
+					{/* Metadata */}
+					<div
+						className={`grid ${
+							isMobile
+								? "grid-cols-2 gap-3"
+								: "grid-cols-2 sm:grid-cols-3 gap-4"
+						} text-sm mb-4`}
+					>
 						<div className="flex flex-col">
 							<span className="font-medium text-gray-500 dark:text-gray-400">
 								Status
 							</span>
-							<span>{status}</span>
+							<span className="text-gray-700 dark:text-gray-300">{status}</span>
 						</div>
 						<div className="flex flex-col">
 							<span className="font-medium text-gray-500 dark:text-gray-400">
 								Episodes
 							</span>
-							<span>{episodes}</span>
+							<span className="text-gray-700 dark:text-gray-300">
+								{episodes}
+							</span>
 						</div>
 						<div className="flex flex-col">
 							<span className="font-medium text-gray-500 dark:text-gray-400">
 								Released
 							</span>
-							<span>{released}</span>
+							<span className="text-gray-700 dark:text-gray-300">
+								{released}
+							</span>
 						</div>
 						<div className="flex flex-col">
 							<span className="font-medium text-gray-500 dark:text-gray-400">
 								Studio
 							</span>
-							<span>{studios.join(", ")}</span>
+							<span className="text-gray-700 dark:text-gray-300 truncate">
+								{studios.join(", ")}
+							</span>
 						</div>
 						<div className="flex flex-col">
 							<span className="font-medium text-gray-500 dark:text-gray-400">
 								Type
 							</span>
-							<span>{type}</span>
+							<span className="text-gray-700 dark:text-gray-300">{type}</span>
 						</div>
-
 						<div className="flex flex-col">
 							<span className="font-medium text-gray-500 dark:text-gray-400">
 								Rating
 							</span>
-							<span>{rating}</span>
+							<span className="text-gray-700 dark:text-gray-300">{rating}</span>
 						</div>
-						<div className="flex flex-col">
+						<div
+							className={`flex flex-col ${
+								isMobile ? "col-span-2" : ""
+							} text-gray-700 dark:text-gray-300`}
+						>
 							<span className="font-medium text-gray-500 dark:text-gray-400">
 								Genres
 							</span>
-							<span>{genres.join(", ")}</span>
+							<span className="truncate">{genres.join(", ")}</span>
 						</div>
 					</div>
 
@@ -115,7 +133,11 @@ export default function SummaryComponent({
 						<h3 className="font-medium text-gray-900 dark:text-white mb-2">
 							Synopsis
 						</h3>
-						<p className="text-gray-700 dark:text-gray-300 text-sm text-pretty">
+						<p
+							className={`text-gray-700 dark:text-gray-300 ${
+								isMobile ? "text-xs" : "text-sm"
+							} leading-relaxed`}
+						>
 							{isExpanded
 								? synopsis
 								: `${synopsis.slice(0, truncatedLength)}${
@@ -127,7 +149,7 @@ export default function SummaryComponent({
 								onClick={handleToggleExpand}
 								className="mt-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium focus:outline-none cursor-pointer transition-all"
 							>
-								{isExpanded ? "Collapse" : "Load more"}
+								{isExpanded ? "Collapse" : "Read More"}
 							</button>
 						)}
 					</div>

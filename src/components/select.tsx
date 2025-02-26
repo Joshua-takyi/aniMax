@@ -8,7 +8,6 @@ import { motion, AnimatePresence } from "framer-motion";
 interface SelectProps {
 	id: number;
 	name: string;
-	isMulti?: boolean;
 }
 
 interface GenreFilterProps {
@@ -25,11 +24,7 @@ function GenreFilter({
 	const [isOpen, setIsOpen] = useState(false);
 
 	const handleGenreChange = (genreId: number) => {
-		onGenreChange(
-			selectedGenreIds.includes(genreId)
-				? selectedGenreIds.filter((id) => id !== genreId)
-				: [...selectedGenreIds, genreId]
-		);
+		onGenreChange([genreId]);
 	};
 
 	return (
@@ -63,10 +58,11 @@ function GenreFilter({
 									className="flex items-center space-x-2 cursor-pointer hover:bg-primary/90 p-1 rounded"
 								>
 									<input
-										type="checkbox"
+										type="radio"
+										name="genre"
 										checked={selectedGenreIds.includes(genre.id)}
 										onChange={() => handleGenreChange(genre.id)}
-										className="rounded border-gray-300"
+										className="border-gray-300"
 									/>
 									<span className="text-sm">{genre.name}</span>
 								</label>
@@ -79,6 +75,129 @@ function GenreFilter({
 	);
 }
 
+// --- Type Filter ---
+interface TypeFilterProps {
+	selectedType: string;
+	onTypeChange: (type: string) => void;
+}
+
+const typeOptions = [
+	{
+		value: "anime",
+		label: "Anime",
+		hasChildren: true,
+		children: [
+			{ value: "series", label: "TV" },
+			{ value: "movies", label: "Movie" },
+		],
+	},
+	{ value: "manga", label: "Manga", hasChildren: false },
+];
+
+function TypeFilter({ selectedType, onTypeChange }: TypeFilterProps) {
+	const [isOpen, setIsOpen] = useState(false);
+	const [expandedParent, setExpandedParent] = useState<string | null>("anime"); // Default expanded
+
+	const handleTypeChange = (type: string) => {
+		onTypeChange(type);
+	};
+
+	const toggleParentExpand = (value: string) => {
+		setExpandedParent(expandedParent === value ? null : value);
+	};
+
+	return (
+		<div className="border-b border-gray-200 pb-4">
+			<button
+				aria-expanded={isOpen}
+				className="flex w-full items-center justify-between py-2 text-sm font-medium"
+				onClick={() => setIsOpen(!isOpen)}
+			>
+				Type
+				<ChevronDown
+					className={`h-4 w-4 transition-transform ${
+						isOpen ? "rotate-180" : ""
+					}`}
+				/>
+			</button>
+
+			<AnimatePresence>
+				{isOpen && (
+					<motion.div
+						initial={{ height: 0, opacity: 0 }}
+						animate={{ height: "auto", opacity: 1 }}
+						exit={{ height: 0, opacity: 0 }}
+						transition={{ duration: 0.2 }}
+						className="overflow-hidden"
+					>
+						<div className="mt-2 space-y-1">
+							{typeOptions.map((option) => (
+								<div key={option.value} className="mb-1">
+									{option.hasChildren ? (
+										<div>
+											<button
+												className="w-full flex items-center justify-between cursor-pointer hover:bg-primary/10 p-1 rounded"
+												onClick={() => toggleParentExpand(option.value)}
+											>
+												<span className="text-sm font-medium">
+													{option.label}
+												</span>
+												<ChevronDown
+													className={`h-4 w-4 transition-transform ${
+														expandedParent === option.value ? "rotate-180" : ""
+													}`}
+												/>
+											</button>
+
+											<AnimatePresence>
+												{expandedParent === option.value && (
+													<motion.div
+														initial={{ height: 0, opacity: 0 }}
+														animate={{ height: "auto", opacity: 1 }}
+														exit={{ height: 0, opacity: 0 }}
+														transition={{ duration: 0.15 }}
+														className="overflow-hidden ml-4"
+													>
+														{option.children?.map((child) => (
+															<label
+																key={child.value}
+																className="flex items-center space-x-2 cursor-pointer hover:bg-primary/10 p-1 rounded"
+															>
+																<input
+																	type="radio"
+																	name="type"
+																	checked={selectedType === child.value}
+																	onChange={() => handleTypeChange(child.value)}
+																	className="border-gray-300"
+																/>
+																<span className="text-sm">{child.label}</span>
+															</label>
+														))}
+													</motion.div>
+												)}
+											</AnimatePresence>
+										</div>
+									) : (
+										<label className="flex items-center space-x-2 cursor-pointer hover:bg-primary/10 p-1 rounded">
+											<input
+												type="radio"
+												name="type"
+												checked={selectedType === option.value}
+												onChange={() => handleTypeChange(option.value)}
+												className="border-gray-300"
+											/>
+											<span className="text-sm">{option.label}</span>
+										</label>
+									)}
+								</div>
+							))}
+						</div>
+					</motion.div>
+				)}
+			</AnimatePresence>
+		</div>
+	);
+}
 // --- Rating Filter ---
 interface RatingFilterProps {
 	selectedRating: string;
@@ -218,11 +337,20 @@ export function SideBar({ data }: SidebarProps) {
 	const [selectedGenreIds, setSelectedGenreIds] = useState<number[]>([]);
 	const [selectedRating, setSelectedRating] = useState<string>("");
 	const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
+	const [selectedType, setSelectedType] = useState<string>("anime"); // Default to anime
 
-	// Check if the screen is mobile on mount and when window resizes
+	// Check if the screen is mobile on mount and on window resize
 	useEffect(() => {
 		const checkIfMobile = () => {
-			setIsMobile(window.innerWidth < 768);
+			const isMobileView = window.innerWidth < 890;
+			setIsMobile(isMobileView);
+
+			// Show sidebar by default only on desktop
+			if (!isMobileView) {
+				setIsVisible(true);
+			} else {
+				setIsVisible(false);
+			}
 		};
 
 		// Set initial value
@@ -230,9 +358,6 @@ export function SideBar({ data }: SidebarProps) {
 
 		// Add resize listener
 		window.addEventListener("resize", checkIfMobile);
-
-		// Show sidebar by default on desktop
-		if (!isMobile) setIsVisible(true);
 
 		// Clean up
 		return () => window.removeEventListener("resize", checkIfMobile);
@@ -262,66 +387,87 @@ export function SideBar({ data }: SidebarProps) {
 			const statuses = statusParam.split(",");
 			setSelectedStatuses(statuses);
 		}
+
+		// Get type from URL
+		const typeParam = params.get("type");
+		if (typeParam) {
+			setSelectedType(typeParam);
+		}
 	}, []);
 
 	const handleApplyFilters = useCallback(() => {
-		const url = new URL(window.location.href);
-		const params = new URLSearchParams(url.search);
+		const params = new URLSearchParams();
 
 		// Update genres (as comma-separated list of IDs)
 		if (selectedGenreIds.length > 0) {
 			params.set("genre", selectedGenreIds.join(","));
-		} else {
-			params.delete("genre");
 		}
 
 		// Update rating
 		if (selectedRating) {
 			params.set("rating", selectedRating);
-		} else {
-			params.delete("rating");
 		}
 
 		// Update status
 		if (selectedStatuses.length > 0) {
 			params.set("status", selectedStatuses.join(","));
-		} else {
-			params.delete("status");
 		}
 
-		// Update URL without page refresh
-		const newUrl = `${window.location.pathname}?${params.toString()}`;
-		window.history.pushState({}, "", newUrl);
+		// Get the current path from window.location.pathname
+		const currentPath = window.location.pathname;
+
+		// Only change the path if type is explicitly selected
+		let path = currentPath;
+		if (selectedType !== "anime") {
+			path = `/${selectedType}`;
+		}
+
+		const newUrl = `${path}?${params.toString()}`;
+		window.location.href = newUrl;
 
 		// Close sidebar on mobile after applying filters
 		if (isMobile) {
 			setIsVisible(false);
 		}
-	}, [selectedGenreIds, selectedRating, selectedStatuses, isMobile]);
+	}, [
+		selectedGenreIds,
+		selectedRating,
+		selectedStatuses,
+		selectedType,
+		isMobile,
+	]);
 
 	const handleClearAll = useCallback(() => {
 		setSelectedGenreIds([]);
 		setSelectedRating("");
 		setSelectedStatuses([]);
+		setSelectedType("anime"); // Reset to default type
 		window.history.pushState({}, "", window.location.pathname);
+		window.location.reload(); // Refresh the page
 	}, []);
 
 	// Get total number of active filters for indicator
 	const totalActiveFilters =
 		selectedGenreIds.length +
 		(selectedRating ? 1 : 0) +
-		selectedStatuses.length;
+		selectedStatuses.length +
+		(selectedType !== "anime" ? 1 : 0);
+
+	// Sidebar position and styling based on mobile/desktop
+	const sidebarClasses = isMobile
+		? "fixed top-0 right-0 h-screen max-h-screen w-64 border-l px-4 overflow-y-auto z-50 bg-background shadow-lg"
+		: "sticky top-17 w-72 h-fit max-h-screen px-4 overflow-y-auto";
 
 	return (
 		<>
-			{/* Chevron toggle button for mobile */}
+			{/* Mobile toggle button (fade in/out, no slide) */}
 			<AnimatePresence>
 				{isMobile && !isVisible && (
 					<motion.button
-						initial={{ opacity: 0, x: 10 }}
-						animate={{ opacity: 1, x: 0 }}
-						exit={{ opacity: 0, x: 10 }}
-						className="fixed top-1/2 right-0 -translate-y-1/2 z-50 bg-primary text-white p-2 rounded-l-md shadow-lg"
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 1 }}
+						exit={{ opacity: 0 }}
+						className="fixed top-1/2 right-0 -translate-y-1/2 z-50 bg-primary text-white dark:bg-black p-2 rounded-l-md shadow-lg"
 						onClick={() => setIsVisible(true)}
 					>
 						<ChevronLeft className="h-6 w-6" />
@@ -334,29 +480,65 @@ export function SideBar({ data }: SidebarProps) {
 				)}
 			</AnimatePresence>
 
-			{/* Sidebar */}
+			{/* Sidebar with different animations for mobile/desktop */}
 			<AnimatePresence>
 				{isVisible && (
 					<motion.aside
-						initial={isMobile ? { x: "100%" } : { x: -300 }}
-						animate={{ x: 0 }}
-						exit={isMobile ? { x: "100%" } : { x: -300 }}
-						transition={{ type: "spring", stiffness: 300, damping: 30 }}
-						className={`fixed md:sticky top-0 right-0 md:right-auto h-screen md:h-fit max-h-screen w-64 md:w-72 
-        md:bg-transparent border-l md:border-l-0 md:border-r  bg-background
-        p-6 overflow-y-auto z-40 z-50`}
+						initial={isMobile ? { x: "100%" } : { opacity: 0 }}
+						animate={isMobile ? { x: 0 } : { opacity: 1 }}
+						exit={isMobile ? { x: "100%" } : { opacity: 0 }}
+						transition={{ duration: 0.3 }}
+						className={`${sidebarClasses} ${isMobile ? "" : "md:block"}`}
 					>
 						<div className="flex items-center justify-between mb-6">
 							<h2 className="text-lg font-semibold">Filters</h2>
+							{isMobile && (
+								<button
+									className="rounded-full p-1 hover:bg-muted"
+									onClick={() => setIsVisible(false)}
+									aria-label="Close sidebar"
+								>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										fill="none"
+										viewBox="0 0 24 24"
+										strokeWidth={1.5}
+										stroke="currentColor"
+										className="w-5 h-5"
+									>
+										<path
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											d="M6 18L18 6M6 6l12 12"
+										/>
+									</svg>
+								</button>
+							)}
+						</div>
+
+						<div className="flex items-center justify-between mb-6">
 							<button
 								className="text-sm text-blue-600 hover:text-blue-800 cursor-pointer"
 								onClick={handleClearAll}
 							>
 								Clear all
 							</button>
+							{isMobile && (
+								<div className="text-sm">
+									{totalActiveFilters > 0 ? (
+										<span>{totalActiveFilters} active filters</span>
+									) : (
+										<span>No active filters</span>
+									)}
+								</div>
+							)}
 						</div>
 
 						<div className="space-y-4">
+							<TypeFilter
+								selectedType={selectedType}
+								onTypeChange={setSelectedType}
+							/>
 							<GenreFilter
 								data={data}
 								selectedGenreIds={selectedGenreIds}
@@ -378,20 +560,31 @@ export function SideBar({ data }: SidebarProps) {
 						>
 							Apply Filters
 						</Button>
+
+						{/* Add swipe indicator for mobile */}
+						{isMobile && (
+							<div className="absolute bottom-8 left-0 right-0 flex justify-center">
+								<div className="h-1 w-16 bg-muted-foreground/30 rounded-full" />
+								<span className="sr-only">Swipe right to close</span>
+							</div>
+						)}
 					</motion.aside>
 				)}
 			</AnimatePresence>
 
 			{/* Overlay for mobile sidebar */}
-			{isMobile && isVisible && (
-				<motion.div
-					initial={{ opacity: 0 }}
-					animate={{ opacity: 0.5 }}
-					exit={{ opacity: 0 }}
-					className="fixed inset-0 bg-black z-30"
-					onClick={() => setIsVisible(false)}
-				/>
-			)}
+			<AnimatePresence>
+				{isMobile && isVisible && (
+					<motion.div
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 0.5 }}
+						exit={{ opacity: 0 }}
+						transition={{ duration: 0.2 }}
+						className="fixed inset-0 bg-black z-40"
+						onClick={() => setIsVisible(false)}
+					/>
+				)}
+			</AnimatePresence>
 		</>
 	);
 }

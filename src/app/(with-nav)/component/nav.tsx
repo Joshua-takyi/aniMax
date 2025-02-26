@@ -1,17 +1,36 @@
 "use client";
 import Image from "next/image";
 import logo from "@/../public/images/logo.svg";
-import Wrapper from "@/components/wrapper";
+// import Wrapper from "@/components/wrapper";
 import SearchComponent from "@/components/search";
 import Link from "next/link";
 import { ModeToggle } from "@/components/dark-mode-toggle";
-import { navLinks } from "@/components/nav";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useRef } from "react";
-
+const navLinks = [
+	{
+		id: 1,
+		path: "/",
+		text: "Home",
+	},
+	{
+		id: 2,
+		path: "/movies",
+		text: "movies",
+	},
+	{
+		id: 3,
+		path: "/series",
+		text: "Tv series",
+	},
+	{
+		id: 4,
+		path: "/topAiring",
+		text: "top airing",
+	},
+];
 export default function MainNav() {
 	const pathName = usePathname();
 	const isActive = (path: string) => pathName === path;
@@ -19,6 +38,7 @@ export default function MainNav() {
 	const shouldReduceMotion = useReducedMotion();
 	const menuRef = useRef<HTMLDivElement>(null);
 	const buttonRef = useRef<HTMLButtonElement>(null);
+	const touchStartY = useRef<number | null>(null);
 
 	// Close mobile menu when route changes
 	useEffect(() => {
@@ -52,6 +72,43 @@ export default function MainNav() {
 		return () => {
 			document.removeEventListener("mousedown", handleClickOutside);
 			document.removeEventListener("keydown", handleEscapeKey);
+		};
+	}, [isOpen]);
+
+	// Set up touch handlers for swipe to close
+	useEffect(() => {
+		if (!menuRef.current || !isOpen) return;
+
+		const handleTouchStart = (e: TouchEvent) => {
+			touchStartY.current = e.touches[0].clientY;
+		};
+
+		const handleTouchMove = (e: TouchEvent) => {
+			if (touchStartY.current === null) return;
+
+			const touchY = e.touches[0].clientY;
+			const deltaY = touchY - touchStartY.current;
+
+			// If user is swiping up (negative deltaY) and the gesture is significant enough
+			if (deltaY < -50) {
+				setIsOpen(false);
+				touchStartY.current = null;
+			}
+		};
+
+		const handleTouchEnd = () => {
+			touchStartY.current = null;
+		};
+
+		const menuElement = menuRef.current;
+		menuElement.addEventListener("touchstart", handleTouchStart);
+		menuElement.addEventListener("touchmove", handleTouchMove);
+		menuElement.addEventListener("touchend", handleTouchEnd);
+
+		return () => {
+			menuElement.removeEventListener("touchstart", handleTouchStart);
+			menuElement.removeEventListener("touchmove", handleTouchMove);
+			menuElement.removeEventListener("touchend", handleTouchEnd);
 		};
 	}, [isOpen]);
 
@@ -96,10 +153,14 @@ export default function MainNav() {
 	};
 
 	return (
-		<header className={cn("w-full sticky z-40 transition-all duration-300")}>
-			<Wrapper className="flex justify-between items-center py-4 rounded-full bg-background/80 backdrop-blur-md border-[0.9px] border-border/40">
+		<header
+			className={cn("w-full sticky xl:top-0 z-40 transition-all duration-300 ")}
+		>
+			<div className="flex justify-between items-center py-2 bg-background/80 backdrop-blur-md border-[0.9px] border-border/40">
 				<Link href={"/"}>
-					<Image src={logo} alt="my logo" priority />
+					<div className="cursor-pointer">
+						<Image src={logo} alt="my logo" priority />
+					</div>
 				</Link>
 				<nav className="hidden md:block w-full">
 					<ul className="flex items-center justify-between gap-10">
@@ -116,13 +177,15 @@ export default function MainNav() {
 										className={cn(
 											"p-2 capitalize", // base classes
 											{
-												"text-primary font-bold": isActive(nav.path), // applied when active
+												"text-primary font-bold ": isActive(nav.path), // applied when active
 												"text-muted-foreground hover:text-primary transition-colors":
 													!isActive(nav.path), // applied when not active
 											}
 										)}
 									>
-										<Link href={nav.path}>{nav.text}</Link>
+										<Link href={nav.path} className="cursor-pointer">
+											{nav.text}
+										</Link>
 									</motion.li>
 								))}
 							</AnimatePresence>
@@ -180,7 +243,6 @@ export default function MainNav() {
 					{isOpen && (
 						<motion.div
 							ref={menuRef}
-							role="dialog"
 							aria-modal="true"
 							aria-label="Mobile navigation menu"
 							key="mobile-menu"
@@ -189,7 +251,7 @@ export default function MainNav() {
 							initial="hidden"
 							animate="visible"
 							exit="exit"
-							className="fixed top-0 left-0 w-full h-full bg-background/95 backdrop-blur-md z-40 overflow-hidden"
+							className="fixed top-0 left-0 w-full h-full bg-background backdrop-blur-md z-40 overflow-hidden"
 						>
 							<div className="flex flex-col h-full justify-center items-center">
 								<motion.ul
@@ -226,11 +288,15 @@ export default function MainNav() {
 								<div className="mt-12">
 									<SearchComponent />
 								</div>
+								<div className="absolute bottom-12 left-0 right-0 flex justify-center">
+									<div className="h-1 w-16 bg-muted-foreground/30 rounded-full" />
+									<span className="sr-only">Swipe up to close menu</span>
+								</div>
 							</div>
 						</motion.div>
 					)}
 				</AnimatePresence>
-			</Wrapper>
+			</div>
 		</header>
 	);
 }

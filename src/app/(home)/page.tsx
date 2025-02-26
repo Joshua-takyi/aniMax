@@ -1,3 +1,9 @@
+import Wrapper from "@/components/wrapper";
+
 export default function Home() {
-	return <div>hello</div>;
+	return (
+		<div>
+			<Wrapper>hello</Wrapper>
+		</div>
+	);
 }

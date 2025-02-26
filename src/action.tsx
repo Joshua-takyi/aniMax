@@ -65,11 +65,11 @@ export async function GetMovies({
 			params: {
 				type,
 				page,
-				limit: 20,
+				limit: 18,
 				order_by: "popularity",
 				rating: rating ? ratingMapping[rating.toLowerCase()] : undefined,
 				status: status ? statusMapping[status.toLowerCase()] : undefined,
-				genres: genre || undefined,
+				genres: genre ? String(genre) : undefined,
 			},
 			headers: {
 				"Content-Type": "application/json",

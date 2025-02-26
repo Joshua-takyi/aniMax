@@ -3,7 +3,8 @@
 import { GetAnimeById } from "@/action";
 import Loader from "@/app/loading";
 import CharacterComponent from "@/components/charactersComponent";
-import GenreBtns from "@/components/genre-components";
+import Header from "@/components/header";
+// import GenreBtns from "@/components/genre-components";
 import SummaryComponent from "@/components/summaryComponent";
 import VideoSection from "@/components/videoSection";
 import { useQuery } from "@tanstack/react-query";
@@ -35,13 +36,17 @@ interface AnimeData {
 			name: string;
 		}
 	];
+	score: number;
+	duration: string;
 	aired: {
 		string: string;
 	};
+	popularity: number;
 	englishTitle: string;
 	japaneseTitle: string;
 	synopsis: string;
 	rating: string;
+	scored_by: number;
 	season: string;
 }
 
@@ -89,13 +94,20 @@ export default function ProfilePage() {
 		data.titles.find((title) => title.type === "English")?.title ?? "";
 
 	return (
-		<main className="py-8">
+		<main className="md:py-8 py-4 flex flex-col gap-5 ">
+			<Header
+				duration={data.duration}
+				rating={data.rating}
+				imdbRating={data.score}
+				userRating={data.scored_by}
+				year={data.aired.string}
+				popularity={data.popularity}
+				title={englishTitle}
+				originalTitle={japaneseTitle}
+			/>
 			{/* video section */}
 			<VideoSection videoUrl={data.trailer.youtube_id} />
-			<section>
-				{/* Genre section */}
-				{data.genres && <GenreBtns data={data.genres} />}
-			</section>
+			<section>{/* Genre section */}</section>
 			<section>
 				{/* Summary section */}
 				<SummaryComponent
@@ -106,8 +118,6 @@ export default function ProfilePage() {
 					type={data.type}
 					studios={data.studios.map((studio) => studio.name)}
 					released={data.aired.string}
-					englishTitle={englishTitle}
-					japaneseTitle={japaneseTitle}
 					rating={data.rating}
 					synopsis={data.synopsis}
 				/>

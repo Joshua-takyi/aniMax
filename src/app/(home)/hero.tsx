@@ -3,7 +3,7 @@ import Wrapper from "@/components/wrapper";
 
 export default function HeroSection() {
 	return (
-		<main className=" h-[60vh] overflow-hidden bg-[url(/images/wallpaperflare.com_wallpaper.jpg)] bg-cover bg-center bg-no-repeat h-[80dvh] relative backdrop-grayscale-50">
+		<main className=" md:h-[60vh] overflow-hidden bg-[url(/images/wallpaperflare.com_wallpaper.jpg)] bg-cover bg-center bg-no-repeat h-[80dvh] relative backdrop-grayscale-50">
 			<div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/70 to-black/90" />
 			<Wrapper className="relative z-10 h-full flex flex-col items-start justify-center">
 				<div className="gap-4 flex flex-col">
