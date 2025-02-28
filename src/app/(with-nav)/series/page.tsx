@@ -2,11 +2,11 @@
 import { GetMovies, MovieProps } from "@/action";
 import Loader from "@/app/loading";
 import { CardComponent } from "@/components/itemsCard";
-import { MotionDiv } from "@/components/motion";
-import { AnimatePresence } from "framer-motion";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
+import { AnimatePresence } from "framer-motion";
+import { MotionDiv } from "@/components/motion";
 
 export default function Series() {
 	const searchParams = useSearchParams();
@@ -15,27 +15,29 @@ export default function Series() {
 	const status = searchParams.get("status") ?? "";
 	const [currentPage, setCurrentPage] = useState(1);
 	const [data, setData] = useState<MovieProps[]>([]);
-	const [isLoading, setIsLoading] = useState(true);
 	const [isLoadingMore, setIsLoadingMore] = useState(false);
 	const [hasMore, setHasMore] = useState(true);
+	const [isLoading, setIsLoading] = useState(true); // Track initial loading state
 	const { ref, inView } = useInView();
 
-	const fetchMovies = async (page: number) => {
-		const res = await GetMovies({
-			type: "tv",
-			genre,
-			rating,
-			status,
-			page,
-		});
-		return res.data;
-	};
+	const fetchMovies = useCallback(
+		async (page: number) => {
+			const res = await GetMovies({
+				type: "tv",
+				genre,
+				rating,
+				status,
+				page,
+			});
+			return res.data;
+		},
+		[genre, rating, status]
+	);
 
-	// Initial data load - resets when filters change
+	// Initial data fetch
 	useEffect(() => {
 		const fetchData = async () => {
 			setIsLoading(true);
-			setCurrentPage(1); // Reset page when filters change
 			try {
 				const initialMovies = await fetchMovies(1);
 				setData(initialMovies);
@@ -47,9 +49,9 @@ export default function Series() {
 			}
 		};
 		fetchData();
-	}, [genre, rating, status]);
+	}, [genre, rating, status, fetchMovies]); // Add fetchMovies to dependencies
 
-	// Load more data when scrolling
+	// Infinite scroll
 	useEffect(() => {
 		const fetchData = async () => {
 			if (inView && hasMore && !isLoadingMore) {
@@ -73,18 +75,28 @@ export default function Series() {
 		if (inView) {
 			fetchData();
 		}
-	}, [inView, currentPage, isLoadingMore, hasMore, genre, rating, status]);
+	}, [
+		inView,
+		currentPage,
+		isLoadingMore,
+		hasMore,
+		genre,
+		rating,
+		status,
+		fetchMovies,
+	]); // Add fetchMovies to dependencies
 
 	if (isLoading) {
 		return <Loader />;
 	}
+
 	if (!data || data.length === 0) {
 		return <div>No data found</div>;
 	}
 
 	return (
 		<main>
-			<h1 className="text-4xl font-bold mb-10">TV Series</h1>
+			<h1 className="text-4xl font-bold md:mb-10">Movies</h1>
 			<AnimatePresence>
 				<MotionDiv
 					className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"
@@ -92,18 +104,20 @@ export default function Series() {
 					animate={{ opacity: 1 }}
 					transition={{ duration: 0.5 }}
 				>
-					{data.map((item: MovieProps) => (
+					{data.map((item: MovieProps, index) => (
 						<CardComponent
-							key={item.mal_id}
+							key={`${item.mal_id}-${index}`}
 							title={item.title}
 							rating={item.rating}
 							imageUrl={item.images.webp.large_image_url}
 							id={item.mal_id}
 						/>
 					))}
-					<div ref={ref}>{isLoadingMore && <Loader />}</div>
 				</MotionDiv>
 			</AnimatePresence>
+			<div ref={ref} className="lg:pt-4">
+				{isLoadingMore && <Loader />}
+			</div>
 		</main>
 	);
 }

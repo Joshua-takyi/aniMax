@@ -3,9 +3,10 @@ import { GetMovies, MovieProps } from "@/action";
 import Loader from "@/app/loading";
 import { CardComponent } from "@/components/itemsCard";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
+import { MotionDiv } from "@/components/motion";
 
 export default function Movies() {
 	const searchParams = useSearchParams();
@@ -19,17 +20,21 @@ export default function Movies() {
 	const [isLoading, setIsLoading] = useState(true); // Track initial loading state
 	const { ref, inView } = useInView();
 
-	const fetchMovies = async (page: number) => {
-		const res = await GetMovies({
-			type: "movie",
-			genre,
-			rating,
-			status,
-			page,
-		});
-		return res.data;
-	};
+	const fetchMovies = useCallback(
+		async (page: number) => {
+			const res = await GetMovies({
+				type: "tv",
+				genre,
+				rating,
+				status,
+				page,
+			});
+			return res.data;
+		},
+		[genre, rating, status]
+	);
 
+	// Initial data fetch
 	useEffect(() => {
 		const fetchData = async () => {
 			setIsLoading(true);
@@ -44,8 +49,9 @@ export default function Movies() {
 			}
 		};
 		fetchData();
-	}, [genre, rating, status]);
+	}, [genre, rating, status, fetchMovies]); // Add fetchMovies to dependencies
 
+	// Infinite scroll
 	useEffect(() => {
 		const fetchData = async () => {
 			if (inView && hasMore && !isLoadingMore) {
@@ -69,7 +75,16 @@ export default function Movies() {
 		if (inView) {
 			fetchData();
 		}
-	}, [inView, currentPage, isLoadingMore, hasMore, genre, rating, status]);
+	}, [
+		inView,
+		currentPage,
+		isLoadingMore,
+		hasMore,
+		genre,
+		rating,
+		status,
+		fetchMovies,
+	]); // Add fetchMovies to dependencies
 
 	if (isLoading) {
 		return <Loader />;
@@ -83,24 +98,26 @@ export default function Movies() {
 		<main>
 			<h1 className="text-4xl font-bold md:mb-10">Movies</h1>
 			<AnimatePresence>
-				<motion.section
-					className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 md:gap-4 gap-2"
+				<MotionDiv
+					className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"
 					initial={{ opacity: 0 }}
 					animate={{ opacity: 1 }}
 					transition={{ duration: 0.5 }}
 				>
-					{data.map((item: MovieProps) => (
+					{data.map((item: MovieProps, index) => (
 						<CardComponent
-							key={item.mal_id}
+							key={`${item.mal_id}-${index}`}
 							title={item.title}
 							rating={item.rating}
 							imageUrl={item.images.webp.large_image_url}
 							id={item.mal_id}
 						/>
 					))}
-					<div ref={ref}>{isLoadingMore && <Loader />}</div>
-				</motion.section>
+				</MotionDiv>
 			</AnimatePresence>
+			<div ref={ref} className="lg:pt-4">
+				{isLoadingMore && <Loader />}
+			</div>
 		</main>
 	);
 }

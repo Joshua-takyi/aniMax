@@ -27,9 +27,9 @@ export default function Page() {
 	return (
 		<main>
 			<section className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-				{data.map((item: MovieProps) => (
+				{data.map((item: MovieProps, index: number) => (
 					<CardComponent
-						key={item.mal_id}
+						key={`${item.mal_id}-${index}`}
 						title={item.title}
 						rating={item.rating}
 						imageUrl={item.images.webp.large_image_url}

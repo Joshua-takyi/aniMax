@@ -18,7 +18,6 @@ export const animeGenres = [
 	{ name: "Mecha", id: 18 },
 	{ name: "Music", id: 19 },
 	{ name: "Parody", id: 20 },
-	{ name: "Samurai", id: 21 },
 	{ name: "Romance", id: 22 },
 	{ name: "School", id: 23 },
 	{ name: "Sci-Fi", id: 24 },
@@ -78,4 +77,90 @@ export const animeGenres = [
 	{ name: "Crossdressing", id: 81 },
 	{ name: "Urban Fantasy", id: 82 },
 	{ name: "Villainess", id: 83 },
+];
+
+export const categoryPillsData = [
+	{
+		id: 1,
+		name: "Action",
+	},
+	{
+		id: 2,
+		name: "Adventure",
+	},
+	{
+		id: 3,
+		name: "Cars",
+	},
+	{
+		id: 4,
+		name: "Comedy",
+	},
+	{
+		id: 5,
+		name: "Avant Garde",
+	},
+	{
+		id: 6,
+		name: "Mythology",
+	},
+	{
+		id: 7,
+		name: "Mystery",
+	},
+	{
+		id: 8,
+		name: "Drama",
+	},
+	{
+		id: 9,
+		name: "Ecchi",
+	},
+	{
+		id: 10,
+		name: "Fantasy",
+	},
+];
+
+export const ImagesSection = [
+	{
+		id: 1,
+		image: "/animax/sfk-01-1040x1560.original.jpg",
+	},
+	{
+		id: 2,
+		image: "/animax/wpg-01-1040x1560.original.jpg",
+	},
+	{
+		id: 3,
+		image: "/animax/mog-01-1040x1560.original.jpg",
+	},
+	{
+		id: 4,
+		image: "/animax/kjg-01-1560x2340.original.jpg",
+	},
+	{
+		id: 5,
+		image: "/animax/vig-01-1040x1560.original.jpg",
+	},
+	{
+		id: 6,
+		image: "/animax/pgp-01-1040x1560.original.jpg",
+	},
+	{
+		id: 7,
+		image: "/animax/tlr-01-1040x1560.original.jpg",
+	},
+	{
+		id: 8,
+		image: "/animax/gmg-01-1040x1560.original.jpg",
+	},
+	{
+		id: 9,
+		image: "/animax/pse-01-1040x1560-v1.original.jpg",
+	},
+	{
+		id: 10,
+		image: "/animax/mli-01-1560x2340.original.jpg",
+	},
 ];

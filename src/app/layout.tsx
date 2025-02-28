@@ -1,16 +1,22 @@
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
-import localFont from "next/font/local"; // Correct import
+// import localFont from "next/font/local";
 import QueryProvider from "@/providers/provider";
 import RenderMounted from "@/components/renderMounted";
-import MainNav from "./(with-nav)/component/nav";
-import Wrapper from "@/components/wrapper";
+import Script from "next/script";
+import SmoothScroll from "@/components/lenis";
 
-const campton = localFont({
-	src: "../fonts/CamptonBook.otf",
-	variable: "--font-campton",
+const inter = Inter({
+	subsets: ["latin"],
+	weight: ["400", "700"],
 });
+
+// const campton = localFont({
+// 	src: "../fonts/CamptonBook.otf",
+// 	variable: "--font-campton",
+// });
 
 export const metadata: Metadata = {
 	title: "AnimeVerse | Your Ultimate Anime Discovery Platform",
@@ -25,7 +31,13 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en">
-			<body className={`${campton.className}  antialiased`}>
+			<body className={`${inter.className}  antialiased `}>
+				<Script
+					async
+					src="https://cse.google.com/cse.js?cx=012345678901234567890:abcdefg"
+					strategy="afterInteractive"
+				/>
+				<div className="gcse-search"></div>
 				<RenderMounted>
 					<ThemeProvider
 						attribute="class"
@@ -34,10 +46,7 @@ export default function RootLayout({
 						disableTransitionOnChange
 					>
 						<QueryProvider>
-							<Wrapper>
-								<MainNav />
-								{children}
-							</Wrapper>
+							<SmoothScroll>{children}</SmoothScroll>
 						</QueryProvider>
 					</ThemeProvider>
 				</RenderMounted>

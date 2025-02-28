@@ -555,12 +555,12 @@ export function SideBar({ data }: SidebarProps) {
 						</div>
 
 						<Button
-							className="w-full mt-6 py-2 rounded-md transition-colors cursor-pointer hover:bg-primary/90"
+							className="w-full mt-6 py-2 rounded-sm transition-colors cursor-pointer hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
 							onClick={handleApplyFilters}
+							disabled={window.location.pathname === "/profile"}
 						>
 							Apply Filters
 						</Button>
-
 						{/* Add swipe indicator for mobile */}
 						{isMobile && (
 							<div className="absolute bottom-8 left-0 right-0 flex justify-center">

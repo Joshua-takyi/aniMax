@@ -34,7 +34,7 @@ export default function VideoSection({
 
 	return (
 		<div
-			className={`w-full relative rounded-md overflow-hidden ${className}`}
+			className={` relative rounded-md overflow-hidden ${className}`}
 			style={{
 				paddingBottom: videoUrl ? getPaddingBottom() : "0",
 			}}

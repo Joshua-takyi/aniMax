@@ -6,6 +6,7 @@ import CharacterComponent from "@/components/charactersComponent";
 import Header from "@/components/header";
 // import GenreBtns from "@/components/genre-components";
 import SummaryComponent from "@/components/summaryComponent";
+// import TelegramComponent from "@/components/telegramComponent";
 import VideoSection from "@/components/videoSection";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
@@ -98,16 +99,16 @@ export default function ProfilePage() {
 			<Header
 				duration={data.duration}
 				rating={data.rating}
-				imdbRating={data.score}
-				userRating={data.scored_by}
 				year={data.aired.string}
-				popularity={data.popularity}
 				title={englishTitle}
 				originalTitle={japaneseTitle}
 			/>
 			{/* video section */}
 			<VideoSection videoUrl={data.trailer.youtube_id} />
-			<section>{/* Genre section */}</section>
+			<section>
+				{/* Genre section */}
+				{/* <CategoryPill /> */}
+			</section>
 			<section>
 				{/* Summary section */}
 				<SummaryComponent
@@ -125,6 +126,10 @@ export default function ProfilePage() {
 			<section className="md:py-12">
 				{/* Character section */}
 				<CharacterComponent id={data.mal_id} />
+			</section>
+			{/* telegram component */}
+			<section>
+				{/* <TelegramComponent fallbackImage={data.images.webp.large_image_url} /> */}
 			</section>
 		</main>
 	);

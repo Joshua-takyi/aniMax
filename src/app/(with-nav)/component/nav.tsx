@@ -1,7 +1,4 @@
 "use client";
-import Image from "next/image";
-import logo from "@/../public/images/logo.svg";
-// import Wrapper from "@/components/wrapper";
 import SearchComponent from "@/components/search";
 import Link from "next/link";
 import { ModeToggle } from "@/components/dark-mode-toggle";
@@ -9,12 +6,8 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useEffect, useState, useRef } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+
 const navLinks = [
-	{
-		id: 1,
-		path: "/",
-		text: "Home",
-	},
 	{
 		id: 2,
 		path: "/movies",
@@ -27,10 +20,11 @@ const navLinks = [
 	},
 	{
 		id: 4,
-		path: "/topAiring",
+		path: "/top-airing",
 		text: "top airing",
 	},
 ];
+
 export default function MainNav() {
 	const pathName = usePathname();
 	const isActive = (path: string) => pathName === path;
@@ -153,13 +147,11 @@ export default function MainNav() {
 	};
 
 	return (
-		<header
-			className={cn("w-full sticky xl:top-0 z-40 transition-all duration-300 ")}
-		>
-			<div className="flex justify-between items-center py-2 bg-background/80 backdrop-blur-md border-[0.9px] border-border/40">
+		<header className={cn("w-full sticky xl:top-0 z-40 ")}>
+			<section className="flex justify-between items-center py-2 bg-background/80 backdrop-blur-md px-4 lg:px-10">
 				<Link href={"/"}>
 					<div className="cursor-pointer">
-						<Image src={logo} alt="my logo" priority />
+						<span className="font-bold uppercase text-2xl">AniVerse</span>
 					</div>
 				</Link>
 				<nav className="hidden md:block w-full">
@@ -183,7 +175,7 @@ export default function MainNav() {
 											}
 										)}
 									>
-										<Link href={nav.path} className="cursor-pointer">
+										<Link href={nav.path} className="p-2 cursor-pointer">
 											{nav.text}
 										</Link>
 									</motion.li>
@@ -210,7 +202,7 @@ export default function MainNav() {
 									xmlns="http://www.w3.org/2000/svg"
 									fill="none"
 									viewBox="0 0 24 24"
-									strokeWidth={1.5}
+									strokeWidth="1.5"
 									stroke="currentColor"
 									className="w-6 h-6"
 								>
@@ -225,7 +217,7 @@ export default function MainNav() {
 									xmlns="http://www.w3.org/2000/svg"
 									fill="none"
 									viewBox="0 0 24 24"
-									strokeWidth={1.5}
+									strokeWidth="1.5"
 									stroke="currentColor"
 									className="w-6 h-6"
 								>
@@ -296,7 +288,7 @@ export default function MainNav() {
 						</motion.div>
 					)}
 				</AnimatePresence>
-			</div>
+			</section>
 		</header>
 	);
 }

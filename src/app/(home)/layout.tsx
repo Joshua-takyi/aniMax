@@ -1,13 +1,13 @@
-import React from "react";
-import HeroSection from "./hero";
-
-export default function HomeLayout({
-	children,
-}: Readonly<{ children: React.ReactNode }>) {
+import { ReactNode } from "react";
+import MainNav from "../(with-nav)/component/nav";
+interface LayoutProps {
+	children: ReactNode;
+}
+export default function Layout({ children }: Readonly<LayoutProps>) {
 	return (
-		<div>
-			<HeroSection />
+		<main>
+			<MainNav />
 			{children}
-		</div>
+		</main>
 	);
 }

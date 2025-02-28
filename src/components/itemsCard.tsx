@@ -25,7 +25,7 @@ export function CardComponent({
 
 	return (
 		<Link
-			href={`/profile/${id}`}
+			href={`/profile/${id}?q=${encodeURIComponent(title)}`}
 			className={`group relative aspect-[2/3] overflow-hidden ${className}`}
 		>
 			<div className="absolute inset-0">
