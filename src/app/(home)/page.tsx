@@ -1,6 +1,5 @@
 import NewReleases from "@/components/newReleases";
 import { HeroSection } from "./hero";
-import HandPicked from "./handPicked";
 import FeaturedContent from "./featuredContent";
 
 export default function Home() {

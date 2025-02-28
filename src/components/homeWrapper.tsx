@@ -4,7 +4,7 @@ export default function HomeWrapper({
 	className,
 }: Readonly<{ children: ReactNode; className?: string }>) {
 	return (
-		<section className={`max-w-[90rem] mx-auto ${className}`}>
+		<section className={`max-w-[95rem] mx-auto ${className}`}>
 			{children}
 		</section>
 	);
