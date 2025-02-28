@@ -15,7 +15,7 @@ interface RecommendAnimeCardProps {
 	id: number;
 }
 
-interface DataProps {
+export interface DataProps {
 	entry: {
 		mal_id: number;
 		images: {
@@ -74,7 +74,9 @@ export default function AnimeSidebar({
 }: Readonly<{ animeId: string }>) {
 	// State management for sidebar visibility and screen size
 	const [isExpanded, setIsExpanded] = useState(false);
-	const [isMobile, setIsMobile] = useState(false);
+	const [isMobile, setIsMobile] = useState(
+		typeof window !== "undefined" ? window.innerWidth < 890 : false
+	);
 	const sidebarRef = useRef<HTMLDivElement>(null);
 
 	// Track whether body scroll should be locked (for mobile)
@@ -89,13 +91,18 @@ export default function AnimeSidebar({
 			});
 			return res.data;
 		},
+		// Add these optimizations:
+		staleTime: 5 * 60 * 1000, // 5 minutes
+		gcTime: 30 * 60 * 1000, // 30 minutes
+		refetchOnWindowFocus: false,
+		refetchOnMount: false,
 	});
 
 	// Handle screen resize and set appropriate sidebar state
 	useEffect(() => {
 		const handleResize = () => {
-			// Define mobile breakpoint at 768px
-			const mobile = window.innerWidth < 768;
+			// Define mobile breakpoint at 890px
+			const mobile = window.innerWidth < 890;
 			setIsMobile(mobile);
 
 			// Auto-expand on desktop, collapse on mobile by default
@@ -171,10 +178,12 @@ export default function AnimeSidebar({
 		return () => document.removeEventListener("keydown", handleEscKey);
 	}, [isExpanded, isMobile]);
 
-	// Don't show anything if no recommendations or still loading
+	// Don't show anything if loading and on mobile
 	if (isLoading) {
+		if (isMobile) return null;
+
 		return (
-			<div className="w-64 lg:w-72  border-l  animate-pulse">
+			<div className="w-64 lg:w-72 border-l animate-pulse">
 				<div className="h-14 bg-slate-100"></div>
 				<div className="p-4 space-y-4">
 					{[1, 2, 3, 4, 5].map((i) => (
@@ -192,24 +201,25 @@ export default function AnimeSidebar({
 		);
 	}
 
-	if (!data || data.length === 0) {
-		return null; // Don't show anything if no recommendations after loading
+	if (!data || data.length === 0 || (isMobile && !isExpanded)) {
+		return isMobile ? <SidebarToggle /> : null;
 	}
 
 	// Get only first 8 recommendations
 	const limitedData = data.slice(0, 8);
 
 	// Mobile toggle button component that appears on the edge of the screen
-	const SidebarToggle = () =>
-		!isExpanded && (
+	function SidebarToggle() {
+		return !isExpanded && isMobile ? (
 			<button
 				onClick={() => setIsExpanded(true)}
-				className="sidebar-toggle fixed top-1/2 transform -translate-y-1/2 z-40 right-0 bg-primary rounded-l-md shadow-lg p-2 transition-all duration-300 ease-in-out md:hidden hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50"
+				className="sidebar-toggle fixed top-1/2 transform -translate-y-1/2 z-40 right-0 bg-primary rounded-l-md shadow-lg p-2 transition-all duration-300 ease-in-out hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50"
 				aria-label="Toggle recommendations sidebar"
 			>
 				<ChevronLeft size={20} />
 			</button>
-		);
+		) : null;
+	}
 
 	// Sidebar content component
 	const SidebarContent = () => (
@@ -262,7 +272,7 @@ export default function AnimeSidebar({
 				className={`
           ${
 						isMobile
-							? `fixed inset-y-0 right-0 z-50 shadow-xl w-72 ${
+							? `fixed inset-y-0 right-0 z-50 shadow-xl w-72 bg-background ${
 									isExpanded ? "translate-x-0" : "translate-x-full"
 							  }`
 							: "relative xl:sticky xl:top-17 w-64 lg:w-72"
@@ -277,12 +287,12 @@ export default function AnimeSidebar({
 				aria-expanded={isExpanded}
 			>
 				{/* Sidebar header */}
-				<div className="flex items-center justify-between p-4 border-b  ">
-					<h2 className="font-semibold ">Recommendations</h2>
+				<div className="flex items-center justify-between p-4 border-b">
+					<h2 className="font-semibold">Recommendations</h2>
 					{isMobile && (
 						<button
 							onClick={() => setIsExpanded(false)}
-							className="text-slate-500  p-1 rounded-full transition-colors"
+							className="text-slate-500 p-1 rounded-full transition-colors"
 							aria-label="Close sidebar"
 						>
 							<X size={18} />

@@ -57,6 +57,8 @@ interface ImageItem {
 	id: number;
 	image: string;
 	name?: string;
+	alt?: string;
+	title?: string;
 }
 
 interface SliderProps {
@@ -68,7 +70,7 @@ const SlideItem = memo(({ item }: { item: ImageItem }) => (
 	<div className="relative px-1">
 		<div className="overflow-hidden">
 			<Image
-				alt={`Anime image ${item.id}`}
+				alt={` ${item.title}`}
 				src={item.image}
 				width={200}
 				height={250}
