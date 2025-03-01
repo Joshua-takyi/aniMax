@@ -87,7 +87,7 @@ This document outlines enhancement recommendations for the anime detail page, sp
 
 - Detailed episode information for series
 - Include episode thumbnails, titles, and brief descriptions
-- Mark filler episodes (if applicable)
+- Mark filler episodes (if applicable) https://api.jikan.moe/v4/anime/20/episodes
 - Implement using the `/anime/{id}/episodes` endpoint
 
 ## Implementation Notes

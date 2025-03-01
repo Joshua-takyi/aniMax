@@ -58,7 +58,6 @@ interface ImageItem {
 	image: string;
 	name?: string;
 	alt?: string;
-	title?: string;
 }
 
 interface SliderProps {
@@ -70,7 +69,7 @@ const SlideItem = memo(({ item }: { item: ImageItem }) => (
 	<div className="relative px-1">
 		<div className="overflow-hidden">
 			<Image
-				alt={` ${item.title}`}
+				alt={` ${item.alt}`}
 				src={item.image}
 				width={200}
 				height={250}
@@ -96,7 +95,7 @@ const SliderComponent: React.FC<SliderProps> = ({ data }) => {
 		infinite: true,
 		speed: 500,
 		slidesToShow: 7,
-		autoplay: false,
+		autoplay: true,
 		slidesToScroll: 1,
 		initialSlide: 0,
 		nextArrow: <NextArrow isDisabled={isDragging} />,

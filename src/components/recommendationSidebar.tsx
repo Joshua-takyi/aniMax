@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { GetAnimeRecommendationsById } from "@/action";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
-import { ChevronRight, ChevronLeft, Star, X } from "lucide-react";
+import { ChevronRight, ChevronLeft, Star, X, Info } from "lucide-react";
 import Link from "next/link";
 
 interface RecommendAnimeCardProps {
@@ -68,6 +68,24 @@ const RecommendAnimeCard = ({
 		</Link>
 	);
 };
+
+// New component for empty recommendation state
+const NoRecommendations = () => (
+	<div className="flex flex-col items-center justify-center p-8 text-center h-64">
+		<Info size={32} className="text-slate-400 mb-3" />
+		<h3 className="text-base font-medium text-slate-700 dark:text-slate-200">
+			No Recommendations
+		</h3>
+		<p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
+			There are no recommendations available for this title yet.
+		</p>
+		{/* INFO: Suggestions for what users can do next */}
+		<p className="text-xs text-slate-400 dark:text-slate-500 mt-4 max-w-xs">
+			If you enjoyed this title, consider being the first to recommend similar
+			anime to others.
+		</p>
+	</div>
+);
 
 export default function AnimeSidebar({
 	animeId,
@@ -178,8 +196,9 @@ export default function AnimeSidebar({
 		return () => document.removeEventListener("keydown", handleEscKey);
 	}, [isExpanded, isMobile]);
 
-	// Don't show anything if loading and on mobile
+	// Handle loading state
 	if (isLoading) {
+		// Don't show anything if loading and on mobile
 		if (isMobile) return null;
 
 		return (
@@ -201,12 +220,14 @@ export default function AnimeSidebar({
 		);
 	}
 
-	if (!data || data.length === 0 || (isMobile && !isExpanded)) {
-		return isMobile ? <SidebarToggle /> : null;
+	// Changed this condition - we'll now show the sidebar even when there's no data
+	if (isMobile && !isExpanded) {
+		return <SidebarToggle />;
 	}
 
 	// Get only first 8 recommendations
-	const limitedData = data.slice(0, 8);
+	const limitedData = data?.slice(0, 8) || [];
+	const hasRecommendations = data && data.length > 0;
 
 	// Mobile toggle button component that appears on the edge of the screen
 	function SidebarToggle() {
@@ -221,29 +242,35 @@ export default function AnimeSidebar({
 		) : null;
 	}
 
-	// Sidebar content component
+	// Modified Sidebar content component to handle empty state
 	const SidebarContent = () => (
 		<div className="space-y-1">
-			{limitedData.map((item: DataProps) => (
-				<RecommendAnimeCard
-					key={item.entry.mal_id}
-					id={item.entry.mal_id}
-					image={item.entry.images.webp.large_image_url}
-					title={item.entry.title}
-					type={item.entry.type || "Unknown"}
-					duration={item.entry.duration || "N/A"}
-					numOfRecommendation={item.votes}
-				/>
-			))}
+			{hasRecommendations ? (
+				<>
+					{limitedData.map((item: DataProps) => (
+						<RecommendAnimeCard
+							key={item.entry.mal_id}
+							id={item.entry.mal_id}
+							image={item.entry.images.webp.large_image_url}
+							title={item.entry.title}
+							type={item.entry.type || "Unknown"}
+							duration={item.entry.duration || "N/A"}
+							numOfRecommendation={item.votes}
+						/>
+					))}
 
-			{data.length > 8 && (
-				<Link
-					href={`/anime/${animeId}/recommendations`}
-					className="flex items-center justify-center text-sm text-indigo-600 font-medium p-2 mt-2 hover:bg-indigo-50 rounded-md transition-colors"
-				>
-					View all recommendations
-					<ChevronRight size={16} className="ml-1" />
-				</Link>
+					{data.length > 8 && (
+						<Link
+							href={`/anime/${animeId}/recommendations`}
+							className="flex items-center justify-center text-sm text-indigo-600 font-medium p-2 mt-2 hover:bg-indigo-50 rounded-md transition-colors"
+						>
+							View all recommendations
+							<ChevronRight size={16} className="ml-1" />
+						</Link>
+					)}
+				</>
+			) : (
+				<NoRecommendations />
 			)}
 		</div>
 	);
@@ -298,7 +325,7 @@ export default function AnimeSidebar({
 							<X size={18} />
 						</button>
 					)}
-					{!isMobile && (
+					{!isMobile && hasRecommendations && (
 						<span className="text-sm px-2 py-0.5 rounded-full">
 							{data.length}
 						</span>

@@ -4,7 +4,7 @@ import { MotionedBtn } from "@/components/motionedBtn";
 
 export const HeroSection = () => {
 	return (
-		<section className="relative lg:bg-[url(/animax/hero.jpg)] bg-[url(/animax/aa73de7b-amcp-app-lp-ott-f_100000013e0u006y000000.jpg)] bg-cover bg-no-repeat bg-center lg:h-[60dvh] h-[60dvh]">
+		<section className="relative lg:bg-[url(/images/hero.jpg)] bg-[url(/images/aa73de7b-amcp-app-lp-ott-f_100000013e0u006y000000.jpg)] bg-cover bg-no-repeat bg-center lg:h-[60dvh] h-[60dvh]">
 			<div className="bg-black/70 absolute inset-0 " />
 			<HomeWrapper className="h-full text-white">
 				<div className=" flex flex-col justify-center items-center w-full h-full ">
@@ -13,7 +13,7 @@ export const HeroSection = () => {
 						className=" relative font-bold px-2  uppercase tracking-tight"
 						style={{ fontSize: "clamp(3rem,12vw,6rem)" }}
 					>
-						Animax
+						Aniverse
 					</h1>
 
 					<p className="text-lg md:text-xl text-center max-w-lg mb-6 opacity-90">

@@ -17,7 +17,7 @@ export default function SearchComponent() {
 	};
 
 	return (
-		<div className="max-w-lg w-full flex items-center shadow-sm hover:shadow transition-all duration-300">
+		<div className="max-w-lg w-full flex items-center  duration-300">
 			<Input
 				type="text"
 				value={search}

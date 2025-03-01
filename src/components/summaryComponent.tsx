@@ -46,7 +46,7 @@ export default function SummaryComponent({
 	};
 
 	return (
-		<div className="w-full overflow-hidden bg-white dark:bg-gray-900  ">
+		<div className="w-full overflow-hidden  dark:bg-gray-900  ">
 			<div className={`flex ${isMobile ? "flex-col" : "flex-row"} gap-6 `}>
 				{/* Image section */}
 				<div

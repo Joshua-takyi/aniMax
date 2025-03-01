@@ -1,9 +1,35 @@
 "use client";
 import { GetCharactersByAnimeId } from "@/action";
 import Loader from "@/app/loading";
-import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import React, { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+
+// TypeScript interfaces for character data structure
+interface CharacterImage {
+	webp?: {
+		image_url: string;
+	};
+}
+
+interface AnimeCharacter {
+	mal_id: number;
+	name: string;
+	images?: CharacterImage;
+}
+
+interface VoiceActor {
+	language: string;
+	person: {
+		name: string;
+	};
+}
+
+interface CharacterData {
+	character: AnimeCharacter;
+	role: string;
+	voice_actors?: VoiceActor[];
+}
 
 interface CharacterProps {
 	id: string;
@@ -17,21 +43,30 @@ const CharacterComponent: React.FC<CharacterProps> = React.memo(
 	}) => {
 		const [showAll, setShowAll] = useState(false);
 
+		// Using React Query to fetch and manage character data
 		const { data, isLoading, error } = useQuery({
-			queryKey: ["characters", id],
+			queryKey: ["anime-characters", id],
 			queryFn: async () => {
-				const res = await GetCharactersByAnimeId({
-					animeId: id,
-				});
-				return res.data;
+				const result = await GetCharactersByAnimeId({ animeId: id });
+				return result.data || ([] as CharacterData[]);
 			},
+			staleTime: 5 * 60 * 1000, // 5 minutes
+			refetchOnWindowFocus: false,
 		});
 
+		// Show loading state
 		if (isLoading) return <Loader />;
-		if (error)
+
+		// Handle error state
+		if (error) {
+			console.error("Error fetching characters:", error);
 			return <div className="p-4 rounded-lg">Error loading characters</div>;
-		if (!data || !Array.isArray(data) || data.length === 0)
-			return <div className="p-4 rounded-lg">No characters found</div>;
+		}
+
+		// Handle empty data
+		if (!data || data.length === 0) {
+			return <div className="p-4 rounded-lg">No character data available</div>;
+		}
 
 		// Determine if we need the "See All" button
 		const hasMoreCharacters = data.length > initialLimit;
@@ -40,51 +75,51 @@ const CharacterComponent: React.FC<CharacterProps> = React.memo(
 
 		return (
 			<div className="space-y-6 px-2">
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 gap-y-6">
-					{displayedCharacters.map((character) => {
-						// Find the main Japanese and English voice actors for each character
-						const japaneseVA = character.voice_actors.find(
-							(va: { language: string }) => va.language === "Japanese"
-						);
-						const englishVA = character.voice_actors.find(
-							(va: { language: string }) => va.language === "English"
+				<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 gap-y-6">
+					{displayedCharacters.map((character: CharacterData) => {
+						// Find only the Japanese voice actor for each character
+						const japaneseVA = character.voice_actors?.find(
+							(va: VoiceActor) => va.language === "Japanese"
 						);
 
 						return (
 							<div
 								key={character.character.mal_id}
-								className="flex items-start space-x-3"
+								className="flex flex-col items-center space-y-2"
 							>
-								<div className="relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0">
+								{/* Character Image */}
+								<div className="relative w-28 h-28 mb-2">
 									<Image
 										src={
-											character.character.images.webp.image_url ||
+											character.character.images?.webp?.image_url ||
 											"/default-character-image.jpg"
 										}
 										alt={character.character.name}
 										fill
-										sizes="(max-width: 640px) 64px, 80px"
+										sizes="(max-width: 640px) 112px, 112px"
 										className="rounded-md object-cover"
 									/>
 								</div>
-								<div className="flex flex-col space-y-1 text-xs sm:text-sm">
-									<h2 className="font-semibold truncate max-w-[180px] sm:max-w-[200px]">
-										{character.character.name}
-									</h2>
-									<p className="truncate max-w-[180px] sm:max-w-[200px]">
-										{character.role}
-									</p>
-									{japaneseVA && (
-										<p className="truncate max-w-[180px] sm:max-w-[200px]">
-											JP: {japaneseVA.person.name}
+
+								{/* Character Info */}
+								<h2 className="font-semibold text-sm text-center truncate w-full">
+									{character.character.name}
+								</h2>
+								<p className="text-xs text-center text-gray-600">
+									{character.role}
+								</p>
+
+								{/* Japanese VA Info - Only show if available */}
+								{japaneseVA && (
+									<div className="flex flex-col items-center mt-2">
+										<p className="text-xs font-medium text-center">
+											Voice Actor
 										</p>
-									)}
-									{englishVA && (
-										<p className="truncate max-w-[180px] sm:max-w-[200px]">
-											EN: {englishVA.person.name}
+										<p className="text-xs text-center">
+											{japaneseVA.person.name}
 										</p>
-									)}
-								</div>
+									</div>
+								)}
 							</div>
 						);
 					})}
