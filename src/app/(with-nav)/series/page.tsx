@@ -18,7 +18,14 @@ export default function Series() {
 	const [isLoadingMore, setIsLoadingMore] = useState(false);
 	const [hasMore, setHasMore] = useState(true);
 	const [isLoading, setIsLoading] = useState(true); // Track initial loading state
-	const { ref, inView } = useInView();
+
+	// Enhanced intersection observer with options optimized for mobile
+	const { ref, inView } = useInView({
+		threshold: 0.1, // Trigger when at least 10% of the element is visible
+		triggerOnce: false, // Continue to trigger as user scrolls
+		rootMargin: "200px", // Start loading earlier (200px before element comes into view)
+		delay: 100, // Small delay to avoid excessive calls
+	});
 
 	const fetchMovies = useCallback(
 		async (page: number) => {
@@ -51,7 +58,7 @@ export default function Series() {
 		fetchData();
 	}, [genre, rating, status, fetchMovies]); // Add fetchMovies to dependencies
 
-	// Infinite scroll
+	// Infinite scroll logic with improved mobile handling
 	useEffect(() => {
 		const fetchData = async () => {
 			if (inView && hasMore && !isLoadingMore) {
@@ -72,19 +79,35 @@ export default function Series() {
 			}
 		};
 
-		if (inView) {
-			fetchData();
+		// Add a small timeout for better mobile handling
+		const timeoutId = setTimeout(() => {
+			if (inView) {
+				fetchData();
+			}
+		}, 100);
+
+		return () => clearTimeout(timeoutId);
+	}, [inView, currentPage, isLoadingMore, hasMore, fetchMovies]);
+
+	// Function to manually load more results
+	const handleManualLoadMore = async () => {
+		if (!hasMore || isLoadingMore) return;
+
+		setIsLoadingMore(true);
+		try {
+			const newMovies = await fetchMovies(currentPage + 1);
+			if (newMovies.length === 0) {
+				setHasMore(false);
+			} else {
+				setData((prevData) => [...prevData, ...newMovies]);
+				setCurrentPage((prevPage) => prevPage + 1);
+			}
+		} catch (error) {
+			console.error("Error fetching more series:", error);
+		} finally {
+			setIsLoadingMore(false);
 		}
-	}, [
-		inView,
-		currentPage,
-		isLoadingMore,
-		hasMore,
-		genre,
-		rating,
-		status,
-		fetchMovies,
-	]); // Add fetchMovies to dependencies
+	};
 
 	if (isLoading) {
 		return <Loader />;
@@ -96,7 +119,6 @@ export default function Series() {
 
 	return (
 		<main>
-			{/* <h1 className="lg:text-4xl text-2xl font-semibold md:mb-10">Tv Series</h1> */}
 			<AnimatePresence>
 				<MotionDiv
 					className="grid  grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3"
@@ -115,8 +137,29 @@ export default function Series() {
 					))}
 				</MotionDiv>
 			</AnimatePresence>
-			<div ref={ref} className="lg:pt-4">
-				{isLoadingMore && <Loader />}
+
+			{/* This invisible element is used for intersection detection */}
+			<div ref={ref} className="h-10 w-full opacity-0" aria-hidden="true" />
+
+			{/* Manual load more button for fallback on mobile */}
+			<div className="flex justify-center my-6">
+				{isLoadingMore ? (
+					<Loader />
+				) : hasMore ? (
+					<button
+						onClick={handleManualLoadMore}
+						className="px-6 py-3 bg-secondary text-secondary-foreground rounded-full 
+                     hover:bg-secondary/90 shadow-sm active:scale-95 transition-all
+                     flex items-center gap-2 touch-manipulation min-h-[48px]"
+						disabled={isLoadingMore}
+					>
+						Load More
+					</button>
+				) : (
+					<p className="text-muted-foreground text-sm">
+						No more series to load
+					</p>
+				)}
 			</div>
 		</main>
 	);

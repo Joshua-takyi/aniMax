@@ -42,6 +42,12 @@ export default function EpisodesComponent({ id }: { id: string }) {
 	const visibleEpisodes =
 		showAll || !initialLimit ? data : data?.slice(0, initialLimit);
 
+	// Handler with debugging to ensure function is being called
+	const handleToggleShowAll = () => {
+		console.log("Toggle clicked, current state:", showAll);
+		setShowAll((prevState) => !prevState);
+	};
+
 	if (isLoading) return <Loader />;
 	if (!data || data.length === 0)
 		return (
@@ -106,13 +112,19 @@ export default function EpisodesComponent({ id }: { id: string }) {
 				</div>
 			</div>
 
-			{/* Improved toggle button */}
-			{data.length > initialLimit && (
+			{/* Enhanced toggle button for better mobile compatibility */}
+			{data?.length > initialLimit && (
 				<div className="flex justify-center mt-8">
 					<button
-						className="px-6 py-2.5 bg-secondary text-secondary-foreground rounded-full hover:bg-secondary/90 font-medium
-                        flex items-center gap-2 transition-all duration-300 hover:shadow-md active:scale-95 group"
-						onClick={() => setShowAll(!showAll)}
+						className="px-6 py-3 bg-secondary text-secondary-foreground rounded-full hover:bg-secondary/90 font-medium
+                      flex items-center gap-2 transition-all duration-300 hover:shadow-md active:scale-95 group
+                      relative z-10 min-h-[48px] touch-manipulation"
+						onClick={handleToggleShowAll}
+						onTouchEnd={(e) => {
+							e.preventDefault(); // Prevent default to avoid double-firing
+							handleToggleShowAll();
+						}}
+						aria-label={showAll ? "Show fewer episodes" : "Show all episodes"}
 					>
 						{showAll ? (
 							<>
