@@ -135,7 +135,7 @@ export default function MainNav() {
 	const menuVariants = {
 		hidden: { height: 0, opacity: 0 },
 		visible: {
-			height: "100vh",
+			height: "100dvh", // Changed from 100vh to 100dvh for dynamic viewport height
 			opacity: 1,
 			transition: { duration: 0.5, ease: "easeInOut" },
 		},
@@ -243,9 +243,9 @@ export default function MainNav() {
 							initial="hidden"
 							animate="visible"
 							exit="exit"
-							className="fixed top-0 left-0 w-full h-full bg-background backdrop-blur-md z-40 overflow-hidden"
+							className="fixed top-0 left-0 w-full h-[100dvh] bg-background backdrop-blur-md z-40 overflow-y-auto"
 						>
-							<div className="flex flex-col h-full justify-center items-center">
+							<div className="flex flex-col min-h-[100dvh] justify-center items-center">
 								<motion.ul
 									className="flex flex-col gap-8 items-center"
 									initial="hidden"
@@ -277,10 +277,10 @@ export default function MainNav() {
 										</motion.li>
 									))}
 								</motion.ul>
-								<div className="mt-12">
+								<div className="mt-8 md:mt-12 w-full max-w-md px-4">
 									<SearchComponent />
 								</div>
-								<div className="absolute bottom-12 left-0 right-0 flex justify-center">
+								<div className="absolute bottom-8 left-0 right-0 flex justify-center">
 									<div className="h-1 w-16 bg-muted-foreground/30 rounded-full" />
 									<span className="sr-only">Swipe up to close menu</span>
 								</div>
