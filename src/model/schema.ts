@@ -1,79 +1,41 @@
-import mongoose, { Model, Schema, Document } from "mongoose";
-import slugify from "slugify";
+import mongoose from "mongoose";
 
 // Interface defining the search result document structure
-interface SearchResult extends Document {
-	title: string;
-	image: string;
-	slug: string;
-	url: string;
-	createdAt: Date;
-	updatedAt: Date;
-}
 
 // Collection name sanitization - MongoDB has restrictions on collection names
-const sanitizeCollectionName = (name: string): string => {
-	// Convert to lowercase, remove special chars, limit length
-	const sanitized = slugify(name, {
-		lower: true,
-		strict: true,
-		replacement: "_",
-	}).slice(0, 50); // MongoDB collection name limit is 64 bytes
 
-	// Ensure the collection name starts with a letter or underscore
-	return /^[a-z]/.test(sanitized) ? sanitized : `anime_${sanitized}`;
-};
-
-// Search result schema definition
-const searchResultSchema = new Schema(
+// Define result schema for anime search results
+const resultSchema = new mongoose.Schema(
 	{
-		title: {
-			type: String,
-			required: true,
-		},
-		image: {
-			type: String,
-			required: true,
-		},
-		slug: {
-			type: String,
-			required: true,
-			unique: true,
-		},
-		url: {
-			type: String,
-			required: true,
-		},
+		title: { type: String, required: true },
+		slug: { type: String, required: true },
+		url: { type: String, required: true },
+		image: { type: String, required: true },
 	},
 	{ timestamps: true }
 );
 
-// Cache for already created models to prevent recreation
-const modelCache: Record<string, Model<SearchResult>> = {};
+/**
+ * Dynamically generates a model for a specific query
+ * This creates/accesses a separate collection for each search query
+ *
+ * @param query - The search query to create a model for
+ * @returns A mongoose model for the specific query collection
+ */
+export function getQueryModel(query: string) {
+	// Sanitize the query to create a valid MongoDB collection name
+	const collectionName = query
+		.toLowerCase()
+		.replace(/[^a-z0-9]/g, "_") // Replace non-alphanumeric chars with underscore
+		.replace(/^_+|_+$/g, "") // Remove leading/trailing underscores
+		.substring(0, 60); // Limit collection name length
 
-// Function to get or create a model for a specific query
-export function getQueryModel(query: string): Model<SearchResult> {
-	const collectionName = sanitizeCollectionName(query);
+	// Add prefix to avoid collection name conflicts
+	const prefixedName = `anime_${collectionName}`;
 
-	// If model already created, return from cache
-	if (modelCache[collectionName]) {
-		return modelCache[collectionName];
-	}
-
-	// Check if model exists in mongoose.models
-	if (mongoose.models[collectionName]) {
-		modelCache[collectionName] = mongoose.models[
-			collectionName
-		] as Model<SearchResult>;
-		return modelCache[collectionName];
-	}
-
-	// Create new model if it doesn't exist
-	const model = mongoose.model<SearchResult>(
-		collectionName,
-		searchResultSchema
+	// Check if model already exists to prevent mongoose overwrite warning
+	return (
+		mongoose.models[prefixedName] ||
+		mongoose.model(prefixedName, resultSchema, prefixedName)
 	);
-	modelCache[collectionName] = model;
-
-	return model;
 }

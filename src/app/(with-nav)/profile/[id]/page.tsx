@@ -2,6 +2,7 @@
 
 import { GetAnimeById } from "@/action";
 import Loader from "@/app/loading";
+import AnimeSearchResults from "@/components/AnimeSearchResults";
 import CharacterComponent from "@/components/charactersComponent";
 import EpisodesComponent from "@/components/episdoes";
 import Header from "@/components/header";
@@ -141,6 +142,7 @@ export default function ProfilePage() {
 			{/* telegram component */}
 			<section>
 				{/* <TelegramComponent fallbackImage={data.images.webp.large_image_url} /> */}
+				<AnimeSearchResults />
 			</section>
 		</main>
 	);

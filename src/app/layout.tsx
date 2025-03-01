@@ -27,14 +27,13 @@ export const metadata: Metadata = {
 		apple: [
 			{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
 		],
-		// other: [{ rel: "manifest", url: "/site.webmanifest" }],
 	},
 
 	// ? Social media and Open Graph integration for better sharing
 	openGraph: {
 		title: "Anivese - Find Your Perfect Anime Match",
 		description: "AI-powered anime recommendations tailored to your taste",
-		url: "https://anivese.com",
+		url: "https://ani-max-seven.vercel.app/",
 		siteName: "Anivese",
 		images: [
 			{
@@ -51,14 +50,13 @@ export const metadata: Metadata = {
 		card: "summary_large_image",
 		title: "Anivese - Anime Recommendations",
 		description: "Join our community of anime enthusiasts",
-		images: ["/twitter-image.jpg"],
 	},
 
 	// Telegram channel reference
 	alternates: {
-		canonical: "https://anivese.com",
+		canonical: "https://ani-max-seven.vercel.app/",
 		types: {
-			"application/rss+xml": "https://anivese.com/rss.xml",
+			"application/rss+xml": "https://ani-max-seven.vercel.app/rss.xml",
 		},
 	},
 };

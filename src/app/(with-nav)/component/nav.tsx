@@ -1,45 +1,31 @@
 "use client";
-import SearchComponent from "@/components/search";
 import Link from "next/link";
 import { ModeToggle } from "@/components/dark-mode-toggle";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useEffect, useState, useRef } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import SearchComponent from "@/components/search";
 
 const navLinks = [
-	{
-		id: 2,
-		path: "/movies",
-		text: "movies",
-	},
-	{
-		id: 3,
-		path: "/series",
-		text: "Tv series",
-	},
-	{
-		id: 4,
-		path: "/top-airing",
-		text: "top airing",
-	},
+	{ id: 2, path: "/movies", text: "movies" },
+	{ id: 3, path: "/series", text: "Tv series" },
+	{ id: 4, path: "/top-airing", text: "top airing" },
 ];
 
 export default function MainNav() {
 	const pathName = usePathname();
-	const isActive = (path: string) => pathName === path;
 	const [isOpen, setIsOpen] = useState(false);
 	const shouldReduceMotion = useReducedMotion();
 	const menuRef = useRef<HTMLDivElement>(null);
 	const buttonRef = useRef<HTMLButtonElement>(null);
-	const touchStartY = useRef<number | null>(null);
 
-	// Close mobile menu when route changes
+	// Close menu on route change
 	useEffect(() => {
 		setIsOpen(false);
 	}, [pathName]);
 
-	// Handle click outside to close menu
+	// Handle outside clicks and escape key
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
 			if (
@@ -53,7 +39,6 @@ export default function MainNav() {
 			}
 		};
 
-		// Handle escape key press
 		const handleEscapeKey = (event: KeyboardEvent) => {
 			if (event.key === "Escape" && isOpen) {
 				setIsOpen(false);
@@ -69,50 +54,10 @@ export default function MainNav() {
 		};
 	}, [isOpen]);
 
-	// Set up touch handlers for swipe to close
+	// Prevent scrolling when menu is open
 	useEffect(() => {
-		if (!menuRef.current || !isOpen) return;
-
-		const handleTouchStart = (e: TouchEvent) => {
-			touchStartY.current = e.touches[0].clientY;
-		};
-
-		const handleTouchMove = (e: TouchEvent) => {
-			if (touchStartY.current === null) return;
-
-			const touchY = e.touches[0].clientY;
-			const deltaY = touchY - touchStartY.current;
-
-			// If user is swiping up (negative deltaY) and the gesture is significant enough
-			if (deltaY < -50) {
-				setIsOpen(false);
-				touchStartY.current = null;
-			}
-		};
-
-		const handleTouchEnd = () => {
-			touchStartY.current = null;
-		};
-
-		const menuElement = menuRef.current;
-		menuElement.addEventListener("touchstart", handleTouchStart);
-		menuElement.addEventListener("touchmove", handleTouchMove);
-		menuElement.addEventListener("touchend", handleTouchEnd);
-
-		return () => {
-			menuElement.removeEventListener("touchstart", handleTouchStart);
-			menuElement.removeEventListener("touchmove", handleTouchMove);
-			menuElement.removeEventListener("touchend", handleTouchEnd);
-		};
-	}, [isOpen]);
-
-	// Prevent scrolling when mobile menu is open
-	useEffect(() => {
-		if (isOpen) {
-			document.body.style.overflow = "hidden";
-		} else {
-			document.body.style.overflow = "";
-		}
+		document.body.style.overflow = isOpen ? "hidden" : "";
+		// Modified cleanup function to properly return void
 		return () => {
 			document.body.style.overflow = "";
 		};
@@ -133,21 +78,20 @@ export default function MainNav() {
 	};
 
 	const menuVariants = {
-		hidden: { height: 0, opacity: 0 },
+		hidden: { opacity: 0 },
 		visible: {
-			height: "100dvh", // Changed from 100vh to 100dvh for dynamic viewport height
 			opacity: 1,
 			transition: { duration: 0.5, ease: "easeInOut" },
 		},
 		exit: {
-			height: 0,
 			opacity: 0,
 			transition: { duration: 0.4, ease: "easeInOut" },
 		},
 	};
 
 	return (
-		<header className={cn("w-full sticky xl:top-0 z-40 ")}>
+		// Fix: Apply sticky positioning at all screen sizes, not just xl breakpoint
+		<header className={cn("w-full sticky top-0 z-50")}>
 			<section className="flex justify-between items-center py-2 bg-background/80 backdrop-blur-md px-4 lg:px-10">
 				<Link href={"/"}>
 					<div className="cursor-pointer">
@@ -167,12 +111,10 @@ export default function MainNav() {
 										exit="exit"
 										custom={index}
 										className={cn(
-											"p-2 capitalize", // base classes
-											{
-												"text-primary font-bold ": isActive(nav.path), // applied when active
-												"text-muted-foreground hover:text-primary transition-colors":
-													!isActive(nav.path), // applied when not active
-											}
+											"p-2 capitalize",
+											pathName === nav.path
+												? "text-primary font-bold"
+												: "text-muted-foreground hover:text-primary transition-colors"
 										)}
 									>
 										<Link href={nav.path} className="p-2 cursor-pointer">
@@ -190,7 +132,7 @@ export default function MainNav() {
 					<ModeToggle />
 					<button
 						ref={buttonRef}
-						onClick={() => setIsOpen((prev) => !prev)}
+						onClick={() => setIsOpen(!isOpen)}
 						className="focus:outline-none focus:ring-2 focus:ring-primary rounded-md z-50"
 						aria-label={isOpen ? "Close menu" : "Open menu"}
 						aria-expanded={isOpen}
@@ -238,14 +180,22 @@ export default function MainNav() {
 							aria-modal="true"
 							aria-label="Mobile navigation menu"
 							key="mobile-menu"
-							id="mobile-menu"
 							variants={menuVariants}
 							initial="hidden"
 							animate="visible"
 							exit="exit"
-							className="fixed top-0 left-0 w-full h-[100dvh] bg-background backdrop-blur-md z-40 overflow-y-auto"
+							className="fixed inset-0 w-full bg-background backdrop-blur-md z-40 overflow-auto h-screen"
+							// Fix: Remove inline style properties that could interfere with fixed positioning
+							style={{
+								position: "fixed", // Ensure this is explicitly fixed
+								top: 0,
+								left: 0,
+								right: 0,
+								bottom: 0,
+							}}
 						>
-							<div className="flex flex-col min-h-[100dvh] justify-center items-center">
+							{/* Fix: Adjust padding to ensure content is properly positioned */}
+							<div className="flex flex-col justify-start items-center pt-20 pb-8 h-full">
 								<motion.ul
 									className="flex flex-col gap-8 items-center"
 									initial="hidden"
@@ -266,7 +216,7 @@ export default function MainNav() {
 												href={link.path}
 												className={cn(
 													"text-2xl font-medium transition-all duration-150",
-													isActive(link.path)
+													pathName === link.path
 														? "text-primary font-bold"
 														: "text-muted-foreground hover:text-primary"
 												)}
@@ -277,12 +227,9 @@ export default function MainNav() {
 										</motion.li>
 									))}
 								</motion.ul>
-								<div className="mt-8 md:mt-12 w-full max-w-md px-4">
+								{/* Fix: Add more space above search for better positioning */}
+								<div className="mt-10 w-[85%] max-w-md">
 									<SearchComponent />
-								</div>
-								<div className="absolute bottom-8 left-0 right-0 flex justify-center">
-									<div className="h-1 w-16 bg-muted-foreground/30 rounded-full" />
-									<span className="sr-only">Swipe up to close menu</span>
 								</div>
 							</div>
 						</motion.div>

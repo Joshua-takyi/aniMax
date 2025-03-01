@@ -96,10 +96,10 @@ export default function Series() {
 
 	return (
 		<main>
-			<h1 className="text-4xl font-bold md:mb-10">Tv Series</h1>
+			{/* <h1 className="lg:text-4xl text-2xl font-semibold md:mb-10">Tv Series</h1> */}
 			<AnimatePresence>
 				<MotionDiv
-					className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"
+					className="grid  grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3"
 					initial={{ opacity: 0 }}
 					animate={{ opacity: 1 }}
 					transition={{ duration: 0.5 }}

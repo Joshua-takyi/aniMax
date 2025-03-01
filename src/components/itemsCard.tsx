@@ -26,7 +26,7 @@ export function CardComponent({
 	return (
 		<Link
 			href={`/profile/${id}?q=${encodeURIComponent(title)}-anime`}
-			className={`group relative aspect-[2/3] overflow-hidden ${className}`}
+			className={`group relative aspect-[2/3] overflow-hidden rounded-md ${className}`}
 		>
 			<div className="absolute inset-0">
 				<Image
