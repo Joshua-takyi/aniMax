@@ -17,10 +17,7 @@ export async function searchAnime(query: string) {
 	try {
 		// Get the base URL for API requests
 		// In server components/actions, we must use absolute URLs for fetch
-		const baseUrl =
-			process.env.NEXT_PUBLIC_BASE_URL ||
-			process.env.VERCEL_URL ||
-			"http://localhost:3000";
+		const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
 		// Ensure we have a properly formatted absolute URL by creating a URL object
 		const apiUrl = new URL("/api/search", baseUrl);

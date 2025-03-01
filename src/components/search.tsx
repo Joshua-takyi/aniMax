@@ -5,7 +5,14 @@ import { Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import useSearch from "@/store/store";
 
-export default function SearchComponent() {
+// Add onSubmit callback prop for sheet control
+interface SearchComponentProps {
+	onSubmit?: () => void;
+}
+
+export default function SearchComponent({
+	onSubmit,
+}: SearchComponentProps = {}) {
 	const router = useRouter();
 	const search = useSearch((state: { search: string }) => state.search);
 
@@ -14,6 +21,10 @@ export default function SearchComponent() {
 		if (search) {
 			useSearch.setState({ search: "" });
 		}
+		// Call onSubmit callback if provided to close the sheet
+		if (onSubmit) {
+			onSubmit();
+		}
 	};
 
 	return (
@@ -21,7 +32,7 @@ export default function SearchComponent() {
 			<Input
 				type="text"
 				value={search}
-				className="py-6 px-5 border-r-0 rounded-l-full ring-0 outline-none placeholder:text-slate-400"
+				className="py-6 px-5 border-r-0 rounded-l-full placeholder:text-slate-400"
 				onChange={(e) => useSearch.setState({ search: e.target.value })}
 				placeholder="Search for your favorite anime..."
 				onKeyDown={(e) => e.key === "Enter" && handleSubmit()}

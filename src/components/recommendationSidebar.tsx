@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { GetAnimeRecommendationsById } from "@/action";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
-import { ChevronRight, ChevronLeft, Star, X, Info } from "lucide-react";
+import { ChevronLeft, Star, X, Info } from "lucide-react";
 import Link from "next/link";
 
 interface RecommendAnimeCardProps {
@@ -259,7 +259,7 @@ export default function AnimeSidebar({
 						/>
 					))}
 
-					{data.length > 8 && (
+					{/* {data.length > 8 && (
 						<Link
 							href={`/anime/${animeId}/recommendations`}
 							className="flex items-center justify-center text-sm text-indigo-600 font-medium p-2 mt-2 hover:bg-indigo-50 rounded-md transition-colors"
@@ -267,7 +267,7 @@ export default function AnimeSidebar({
 							View all recommendations
 							<ChevronRight size={16} className="ml-1" />
 						</Link>
-					)}
+					)} */}
 				</>
 			) : (
 				<NoRecommendations />

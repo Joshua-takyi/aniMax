@@ -13,7 +13,9 @@ const inter = Inter({
 
 // ! IMPORTANT: Metadata configuration for SEO optimization
 export const metadata: Metadata = {
-	title: "AnimeVerse | Your Ultimate Anime Discovery Platform",
+	// Added metadataBase to properly resolve social media image URLs
+	metadataBase: new URL("https://ani-max-seven.vercel.app/"),
+	title: "AniMax | Your Ultimate Anime Discovery Platform",
 	description:
 		"Discover your next favorite anime with personalized recommendations on Anivese",
 	keywords: "anime, recommendations, otaku, anime series, anime movies, manga",

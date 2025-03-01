@@ -7,9 +7,9 @@ export const MotionedBtn = ({ text }: { text: string }) => {
 	const [isHovered, setIsHovered] = useState(false);
 
 	return (
-		<Link href={"/series"} className="inline-block">
+		<Link href={"/series"} className="inline-block w-full">
 			<button
-				className="relative overflow-hidden rounded-full bg-[#00AEEF] px-6 py-3 cursor-pointer"
+				className={`relative overflow-hidden rounded-full bg-[#00AEEF] px-6 py-3 w-full cursor-pointer`}
 				onMouseEnter={() => setIsHovered(true)}
 				onMouseLeave={() => setIsHovered(false)}
 			>
@@ -25,7 +25,11 @@ export const MotionedBtn = ({ text }: { text: string }) => {
 						ease: [0.6, 0.05, -0.01, 0.9],
 					}}
 				/>
-				<span className="relative z-10 font-bold text-black uppercase">
+				<span
+					className={`relative z-10 font-bold transition-all ${
+						isHovered ? "text-white" : "text-black"
+					} uppercase`}
+				>
 					{text}
 				</span>
 			</button>

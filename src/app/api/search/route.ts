@@ -22,7 +22,7 @@ const createErrorResponse = (message: string, error: string, status: number) =>
 
 // Default fallback image for any missing or invalid images
 const DEFAULT_FALLBACK_IMAGE =
-	"https://i.pinimg.com/736x/54/5d/d4/545dd43ddc4ad65b731304f2799dc705.jpg";
+	"https://banner2.cleanpng.com/20180910/jxc/kisspng-portable-network-graphics-telegram-computer-icons-1713942114742.webp";
 
 // List of known problematic domains that often return 404s
 const PROBLEMATIC_DOMAINS = [
